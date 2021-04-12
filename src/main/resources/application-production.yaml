@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@${OJDBC_HOSTNAME:SXAJOPIDV021}:${OJDBC_PORT:1522}/${OJDBC_DATABASE:AJOPA.world}
+    driverClassName: oracle.jdbc.OracleDriver
+    username: ${OJDBC_USERNAME:AJO}
+    password: ${OJDBC_PASSWORD:Uob12345}
+    hikari:
+      idleTimeout: ${IDLE_TIMEOUT:600000}
+      maximumPoolSize: ${POOL_SIZE:1}
+      maxLifetime: ${LIFE_TIME:1800000}
+      poolName: ajo-pool
+  jpa:
+    hibernate.ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        default_schema: ${OJDBC_SCHEMA:ajo}
+        dialect: org.hibernate.dialect.Oracle10gDialect

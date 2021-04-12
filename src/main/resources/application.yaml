@@ -1,0 +1,70 @@
+server:
+  ssl:
+      key-alias: 1
+      key-password: SWLE7B4J4J
+      key-store: keystore/LXAJOPIDV011_server.jks
+      key-store-provider: SUN
+      key-store-type: JKS
+  port: ${SERVER_PORT:8083}
+
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOSTNAME:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:UOB}?useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:welcome1}
+  jpa:
+    hibernate.ddl-auto: update
+    show-sql: false
+  ldap:
+    embedded:
+      ldif: classpath:test-server.ldif
+      base-dn: dc=springframework,dc=org
+      port: 7273
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+      
+security:
+  require-ssl: true
+  security-realm: ${SECURITY_REALM:Java Base}
+  keystore-password: ${KEYSTORE_PASSWORD:Welcome1!}
+  jwt:
+    client-id: ${JWT_CLIENT_ID:adminapp}
+    client-secret: ${JWT_CLIENT_SECRET:password}
+    grant-type: password
+    scope-read: read
+    scope-write: write
+    resource-ids: ${JWT_RESOURCE_IDS:mw/adminapp}
+    access-token-validity: 1
+    refresh-token-validity: 6
+
+swagger:
+  title: ${APP_NAME:UOB Ajo Backend}
+  description: ${APP_NAME_DESC:UOB Aplikasi Jaminan Online Backend API}
+  author:
+    name: ${AUTHOR_NAME:Ebiz}
+    url:
+    email: ${AUTHOR_EMAIL:yuki@ebizcipta.com}
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    prometheus:
+      enabled: true
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+info:
+  app:
+    name: ${APP_NAME:UOB Ajo Backend}
+    java:
+      source: 1.8
+      target: 1.8

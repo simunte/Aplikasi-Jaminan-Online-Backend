@@ -1,0 +1,72 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/uob_ajo?useTimezone=true&serverTimezone=UTC
+    username: uob_ajo
+    password: welcome1!
+  jpa:
+    hibernate.ddl-auto: update
+    show-sql: false
+  ldap:
+    embedded:
+      ldif: classpath:test-server.ldif
+      base-dn: dc=springframework,dc=org
+      port: 7273
+
+security:
+  security-realm: Java Base
+  keystore-password: Welcome1!
+  jwt:
+    client-id: adminapp
+    client-secret: password
+    grant-type: password
+    scope-read: read
+    scope-write: write
+    resource-ids: mw/adminapp
+    access-token-validity: 1
+    refresh-token-validity: 6
+
+as400:
+  driver: com.ibm.as400.access.AS400JDBCDriver
+  url: jdbc:as400://10.225.252.5
+  username: ajoidoleu
+  password: ajoidoleu$
+  file: uobidwh.fittxnm
+
+ftpas400:
+  server: 10.225.252.5
+  port: 21
+  username: ajoidoleu
+  password: ajoidoleu$
+
+swagger:
+  title: Ajo Backend
+  description: UOB Ajo Backend
+  author:
+    name: James Arthur
+    url:
+    email: tommy@ebizcipta.com
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    prometheus:
+      enabled: true
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+info:
+  app:
+    name: Ajo Backend
+    java:
+      source: 1.8
+      target: 1.8

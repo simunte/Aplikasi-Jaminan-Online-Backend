@@ -1,0 +1,53 @@
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+  jpa:
+    hibernate.ddl-auto: update
+    show-sql: false
+
+security:
+  encoding-strength: 256
+  signing-key: yWWcHrTa
+  security-realm: Java Base
+  jwt:
+    client-id: client
+    client-secret: secret
+    grant-type: password
+    scope-read: read
+    scope-write: write
+    resource-ids: resource_id
+    access-token-validity: 1
+    refresh-token-validity: 6
+
+swagger:
+  title: UOB Ajo Backend
+  description: UOB Aplikasi Jasa Online Backend
+  author:
+    name: Yuki Buwana
+    url:
+    email: yuki@ebizcipta.com
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+info:
+  app:
+    name: UOB Ajo Backend
+    java:
+      source: 1.8
+      target: 1.8
+
+user:
+  admin:
+    username: yukibuwana
+    first_name: Yuki
+    last_name: Buwana
+    password: Welcome1!

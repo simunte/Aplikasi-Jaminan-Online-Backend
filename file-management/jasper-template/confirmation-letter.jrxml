@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.9.0.final using JasperReports Library version 6.9.0-cb8f9004be492ccc537180b49c026951f4220bf3  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="confirmation-letter" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="501697da-d990-451b-843b-602488d135b3">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="nomor_konfirmasi" class="java.lang.String"/>
+	<parameter name="tgl_checker_approve" class="java.lang.String"/>
+	<parameter name="nama_beneficiary" class="java.lang.String"/>
+	<parameter name="jenis_produk" class="java.lang.String"/>
+	<parameter name="jenis_jaminan" class="java.lang.String"/>
+	<parameter name="nomor_jaminan" class="java.lang.String"/>
+	<parameter name="tanggal_terbit" class="java.lang.String"/>
+	<parameter name="nilai_jaminan" class="java.lang.String"/>
+	<parameter name="tanggal_berlaku" class="java.lang.String"/>
+	<parameter name="nomor_amendment" class="java.lang.String"/>
+	<parameter name="nomor_kontrak" class="java.lang.String"/>
+	<parameter name="uraian_pekerjaan" class="java.lang.String"/>
+	<parameter name="applicant" class="java.lang.String"/>
+	<parameter name="bank_penerbit" class="java.lang.String"/>
+	<parameter name="currency" class="java.lang.String"/>
+	<parameter name="checker" class="java.lang.String"/>
+	<parameter name="tanda_tangan" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<image>
+				<reportElement x="2" y="25" width="100" height="50" uuid="9921a3b6-c1ca-4b57-934b-444a3cb01be3"/>
+				<imageExpression><![CDATA["../image/logo_uob.png"]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="450" y="24" width="90" height="50" uuid="9b179a1c-c592-47f9-800a-11bd3614cbc6"/>
+				<imageExpression><![CDATA["../image/logo_pln.png"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="66" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="60" height="20" uuid="e761c69f-1861-45b4-ae39-d427f22c6fff"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Nomor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="30" width="60" height="20" uuid="f24d1334-3cb7-4091-bf0e-c4aaad20ad60"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="70" y="10" width="180" height="20" uuid="a4cb47cb-99bd-4d9f-b3d4-01fcaa0808cb"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5" rightIndent="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nomor_konfirmasi}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="60" y="10" width="10" height="20" uuid="be9d80dc-4f2e-41fa-90c6-3cf494ca6a18"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="30" width="10" height="20" uuid="fc6f233d-24d2-4aff-988c-fc4284dc8248"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="70" y="30" width="180" height="20" uuid="ade5cb64-159b-48a8-8388-e2ee2fcafa73"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tgl_checker_approve}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="439" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="2" width="100" height="20" uuid="316029d1-624e-402b-bbd9-da5f245be3f1"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Kepada]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="22" width="230" height="30" uuid="802668bc-727e-4b42-a994-61fa035b0a94"/>
+				<textElement verticalAlignment="Top">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nama_beneficiary}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="72" width="550" height="20" uuid="d4769563-446b-48d8-a1e2-5a00e94dfa10"/>
+				<textElement>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Bersama ini kami konfirmasikan bahwa Jaminan Dengan Informasi Sebagai Berikut : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="98" width="125" height="15" uuid="9d12e8cb-1994-48ee-b30c-92702e201c0d"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Produk Jaminan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="113" width="125" height="15" uuid="53adfe0a-5006-4d4c-a6b6-9b64c00915ae"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Jenis Jaminan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="128" width="125" height="15" uuid="5c600c6a-fbde-4b1c-a022-7939044cfc5b"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Nomor Jaminan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="143" width="125" height="15" uuid="cee7d9f8-a668-4254-aa8c-fb690ff26340"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Nomor Amendment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="158" width="125" height="15" uuid="36c6be54-eebe-4442-afd5-b7fe933e943f"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Tanggal Penerbitan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="188" width="125" height="15" uuid="2c892075-d3f8-43e9-9b4a-ee47ad96c75c"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Nilai Jaminan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="203" width="125" height="15" uuid="54cb61d1-cd2e-4b8d-acd8-8f99762e3e12"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Masa Berlaku]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="218" width="430" height="15" uuid="25aabfc6-4933-4b26-8180-a7be83dadc78"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Nomor Kontrak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="233" width="430" height="15" uuid="c9ed1b1f-7ea9-4317-9fc5-407e60e5c638"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Uraian Pekerjaan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="248" width="430" height="15" uuid="1c6f9eb1-05f1-49bb-af7c-7cc63569555f"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Applicant]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="263" width="430" height="15" uuid="210daca6-ad9f-4c54-8b0f-969e6f92efa8"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Beneficiary]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="0" y="278" width="430" height="15" uuid="9f142b6a-e2fd-4846-a887-b0a603a2ec6c"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Proses Pengajuan Klaim]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="98" width="10" height="15" uuid="273e9072-7d01-45db-91c6-b860c1a83221"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="113" width="10" height="15" uuid="106d9673-e9d5-459b-9fe9-ba6f7eb2b15f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="128" width="10" height="15" uuid="cd1d47db-5f81-4fe4-af70-1c7a91bbc549"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="143" width="10" height="15" uuid="99073dda-4b2e-4757-a3e0-61b3b37f71e3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="203" width="10" height="15" uuid="f0647c43-2e38-42de-b5f7-56b583ad178e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="158" width="10" height="15" uuid="36c903c6-2825-457d-907d-b35335414395"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="188" width="10" height="15" uuid="a4e3acf4-79c9-45cb-a143-14e396da197e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="125" y="218" width="305" height="15" uuid="13763004-9de2-4946-b5c5-76c34cacb59b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="125" y="263" width="305" height="15" uuid="8a653112-55fa-4c02-a56e-170404ef2717"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="125" y="233" width="305" height="15" uuid="1c354e84-47d7-41e1-8ef6-653b0d8e96ff"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="125" y="248" width="305" height="15" uuid="2d62bdb2-1cc0-495c-985c-97f0b664ae4f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="125" y="278" width="305" height="15" uuid="ce2aa1d1-857a-4b37-b737-0ebc242c9329"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="98" width="295" height="15" uuid="520f143f-ebc4-49cd-9aa4-b9cb6e61b024"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{jenis_produk}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="113" width="295" height="15" uuid="46bec395-c36a-42ba-875f-c67ead9ce225"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{jenis_jaminan}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="128" width="295" height="15" uuid="25882ec7-5610-4485-b612-05a24fabc164"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nomor_jaminan}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="143" width="295" height="15" uuid="100551fb-cb5f-4ab3-b39e-04268bd553aa"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nomor_amendment}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="158" width="295" height="15" uuid="d246f70c-9248-4f53-be96-9712cecd2542"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tanggal_terbit}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="188" width="295" height="15" uuid="bd46339a-c828-4a0a-bb35-9c2f4bbd157e"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nilai_jaminan}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="203" width="295" height="15" uuid="0c994730-a992-4d44-b582-95acd0c6987a"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tanggal_berlaku}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="135" y="218" width="295" height="15" uuid="356655f7-1c11-4a61-b12c-a6bbbcf23a30"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nomor_kontrak}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="135" y="233" width="295" height="15" uuid="89b686c6-d274-4c01-9748-3ee1738657ba"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{uraian_pekerjaan}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="135" y="248" width="295" height="15" uuid="57f18db7-bd56-4557-a266-1a190e55d51e"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{applicant}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="135" y="263" width="295" height="15" uuid="5e4cd7e4-0362-4365-ab5c-ed9743edf992"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nama_beneficiary}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="135" y="278" width="295" height="15" uuid="3e80e270-3901-4f01-88f5-e864c5221dd8"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{bank_penerbit}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="303" width="540" height="47" uuid="046f6977-fe7d-44b3-bb5b-b09270ae1d83"/>
+				<textElement verticalAlignment="Top">
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Adalah BENAR, SAH, dan VALID Jaminan yang diterbitkan oleh : "+$P{bank_penerbit}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="52" width="550" height="20" uuid="d6f085bf-6899-46a3-b974-312321c01c1f"/>
+				<textElement>
+					<paragraph leftIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Perihal : Konfirmasi Kebenaran dan Validitas "+$P{jenis_jaminan}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="135" y="173" width="295" height="15" uuid="4c89b7f0-5ae9-4726-8e63-229cd753afff"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="3" rightIndent="0"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{currency}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="173" width="125" height="15" uuid="c2b0ceb6-5862-41c0-bca5-5bb887013226"/>
+				<textElement verticalAlignment="Middle">
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<text><![CDATA[Currency]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="125" y="173" width="10" height="15" uuid="930bfaa0-815f-4e0b-8050-c6bd4d687748"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<image scaleImage="RetainShape">
+				<reportElement positionType="Float" x="11" y="354" width="109" height="56" uuid="cdd0b4db-7a50-4872-a468-792ddb46410d"/>
+				<imageExpression><![CDATA[$P{tanda_tangan}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="3" y="411" width="177" height="20" isRemoveLineWhenBlank="true" uuid="de826d40-cde6-460b-a96f-59a1c6688e11"/>
+				<textElement textAlignment="Left">
+					<paragraph leftIndent="5" rightIndent="3"/>
+				</textElement>
+				<textFieldExpression><![CDATA["( "+$P{checker}+" )"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="60" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

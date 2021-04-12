@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta>
+    <style>
+            .email{
+                font-family: 'Source Sans Pro', sans-serif;
+            }
+
+            .clr-grey{
+                color: #a6a6a6;
+            }
+
+            .button_position{
+                text-align: center;
+            }
+
+            .button_position .confirmation_button{
+                margin: 20px 0 20px 0;
+                height: 40px;
+                border-radius: 5px;
+                background-color: #57a600;
+                border: none;
+                color: #ffffff;
+                width: 130px;
+            }
+
+            .link .link--color{
+                color: #24a5de;
+            }
+
+            .link a:-webkit-any-link {
+                color: #24a5de;
+            }
+        </style>
+</head>
+<body>
+<div class="email">
+    <div class="header">
+        <h1 class="clr-grey">Registrasi Ke Sistem OMS Nurindo</h1>
+    </div>
+    <div class="content">
+        <p class="clr-grey">Email Anda telah didaftarkan ke dalam sistem OMS Nurindo, silahkan klik tombol di bawah untuk melakukan setup <i>password</i> atau melakukan paste link di bawah.</p>
+    </div>
+    <div class="button_position">
+        <a th:href="${url}">
+            <button class="confirmation_button">Konfirmasi Email</button>
+        </a>
+    </div>
+    <div class="link">
+        <p class="link--color">Link: <a th:href="${url}" th:text="${url}"></a></p>
+    </div>
+</div>
+</body>
+</html>

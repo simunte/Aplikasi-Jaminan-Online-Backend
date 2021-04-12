@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOSTNAME}:${MYSQL_PORT}/${MYSQL_DATABASE}?useSSL=${MYSQL_USE_SSL}&useLegacyDatetimeCode=${MYSQL_TIME_CODE}&serverTimezone=${MYSQL_TIME_ZONE}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate.ddl-auto: update
+    show-sql: false
+  ldap:
+      embedded:
+        ldif: classpath:test-server.ldif
+        base-dn: dc=springframework,dc=org
+        port: 7273

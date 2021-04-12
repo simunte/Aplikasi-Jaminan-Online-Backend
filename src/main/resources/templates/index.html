@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<br>
+<br>
+
+<a> Dear PT. Bank UOB Indonesia <br> <br> </a>
+
+<a>Mohon melakukan perbaikan atas Bank Guarantee yang telah saudara terbitkan dengan rincian sebagai berikut:</a>
+<br>
+<br>
+
+<table>
+    <tr>
+        <td>Nama Pemohon</td>
+        <td width="30px"> : </td>
+    <td><a  th:text="${namaPemohon}"></a></td>
+    </tr>
+    <tr>
+        <td>No Kontrak</td>
+        <td width="30px">: </td>
+        <td><a  th:text="${noKontrak}"></a></td>
+    </tr>
+    <tr>
+        <td>No Jaminan</td>
+        <td width="30px">: </td>
+        <td><a  th:text="${noJaminan}"></a></td>
+    </tr>
+    <tr>
+        <td>Tanggal Terbit</td>
+        <td width="30px"> : </td>
+        <td><a  th:text="${tanggalTerbit}"></a></td>
+    </tr>
+    <tr>
+        <td>Tanggal Berlaku</td>
+        <td width="30px"> : </td>
+        <td><a  th:text="${tanggalBerlaku}"></a></td>
+    </tr>
+    <tr>
+        <td>Tanggal Jatuh Tempo</td>
+        <td width="30px"> : </td>
+        <td><a  th:text="${tanggalJatuhTempo}"></a></td>
+    </tr>
+    <tr>
+        <td>Mata Uang</td>
+        <td width="30px"> : </td>
+        <td><a  th:text="${currency}"></a></td>
+    </tr>
+    <tr>
+        <td>Nilai Jaminan</td>
+        <td width="30px"> : </td>
+        <td><a  th:text="${nilaiJaminan}"></a></td>
+    </tr>
+    <tr>
+        <td>Catatan</td>
+        <td width="30px"> : </td>
+        <td><a  th:text="${catatan}"></a></td>
+    </tr>
+
+</table>
+<br>
+<a>Terima Kasih </a> <br>
+<a> PT. Perusahaan Listrik Negara </a>
+
+</body>
+</html>
