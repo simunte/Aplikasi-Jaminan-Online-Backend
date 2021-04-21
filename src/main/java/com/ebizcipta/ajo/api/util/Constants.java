@@ -92,12 +92,13 @@ public class Constants {
         public static final String BANK_ADMIN_2_MAKER ="BANK_ADMIN_2_MAKER";
         public static final String BANK_ADMIN_2_CHECKER ="BANK_ADMIN_2_CHECKER";
         public static final String IT = "SYSTEM_OWNER";
-        public static final String BANK_ADMIN_1_MAKER="BANK_ADMIN_1_MAKER";
-        public static final String BANK_ADMIN_1_CHECKER="BANK_ADMIN_1_CHECKER";
+        public static final String BANK_ADMIN_1_MAKER="BANK_ADMIN_MAKER";
+        public static final String BANK_ADMIN_1_CHECKER="BANK_ADMIN_CHECKER";
         public static final String TRO_CHECKER="TRO_CHECKER";
         public static final String TRO_MAKER="TRO_MAKER";
         public static final String CHECKER = "CHECKER";
         public static final String MAKER = "MAKER";
+        public static final String NASABAH = "NASABAH";
     }
 
     public static class MasterDataStatus {

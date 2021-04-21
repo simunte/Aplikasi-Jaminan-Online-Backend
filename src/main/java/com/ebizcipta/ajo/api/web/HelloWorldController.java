@@ -1,6 +1,9 @@
 package com.ebizcipta.ajo.api.web;
 
+import com.ebizcipta.ajo.api.service.RoleService;
 import com.ebizcipta.ajo.api.service.UserService;
+import com.ebizcipta.ajo.api.service.dto.RoleListDTO;
+import com.ebizcipta.ajo.api.service.dto.UserCreateDTO;
 import com.ebizcipta.ajo.api.util.AuditTrailUtil;
 import com.ebizcipta.ajo.api.util.Constants;
 import com.ebizcipta.ajo.api.util.MasterData;
@@ -14,8 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -25,11 +30,13 @@ public class HelloWorldController {
     private final MasterData masterData;
     private final ServiceSchedulerUtil serviceSchedulerUtil;
     private final UserService userService;
+    private final RoleService roleService;
 
-    public HelloWorldController(MasterData masterData, ServiceSchedulerUtil serviceSchedulerUtil, UserService userService) {
+    public HelloWorldController(MasterData masterData, ServiceSchedulerUtil serviceSchedulerUtil, UserService userService, RoleService roleService) {
         this.masterData = masterData;
         this.serviceSchedulerUtil = serviceSchedulerUtil;
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @ApiOperation(value = "Hello World")
@@ -69,5 +76,19 @@ public class HelloWorldController {
                 .body(result);
     }
 
+    @GetMapping("/roles")
+    @ApiOperation("get All Role")
+    public ResponseEntity<List<RoleListDTO>> getAllRole(){
+        List<RoleListDTO> result = roleService.findAllRole();
+        return ResponseEntity.ok()
+                .body(result);
+    }
 
+    @PostMapping("/users")
+    @ApiOperation("Add User")
+    public ResponseEntity<Boolean> addUser(@Valid @RequestBody UserCreateDTO userCreateDTO) throws URISyntaxException {
+        Boolean result = userService.saveUser(userCreateDTO);
+        return ResponseEntity.created(new URI("/api/v1/users"+userCreateDTO.getUsername()))
+                .body(result);
+    }
 }

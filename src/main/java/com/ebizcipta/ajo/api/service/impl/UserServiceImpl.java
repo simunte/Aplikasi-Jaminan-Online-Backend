@@ -6,8 +6,10 @@ import com.ebizcipta.ajo.api.exception.BadRequestAlertException;
 import com.ebizcipta.ajo.api.repositories.*;
 import com.ebizcipta.ajo.api.service.UserService;
 import com.ebizcipta.ajo.api.service.dto.*;
+import com.ebizcipta.ajo.api.service.mapper.NasabahSupportDocumentMapper;
 import com.ebizcipta.ajo.api.service.mapper.UserHistoryMapper;
 import com.ebizcipta.ajo.api.service.mapper.UserMapper;
+import com.ebizcipta.ajo.api.service.mapper.UserNasabahMapper;
 import com.ebizcipta.ajo.api.service.validator.UserValidator;
 import com.ebizcipta.ajo.api.util.AuditTrailUtil;
 import com.ebizcipta.ajo.api.util.Constants;
@@ -29,10 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -58,6 +57,10 @@ public class UserServiceImpl implements UserDetailsService, UserService{
     private UserUtil userUtil;
     @Autowired
     private UserHistoryRepository userHistoryRepository;
+    @Autowired
+    private UserNasabahRepository userNasabahRepository;
+    @Autowired
+    private NasabahSupportDocumentRepository nasabahSupportDocumentRepository;
     @Autowired
     private AuditTrailUtil auditTrailUtil;
 
@@ -88,30 +91,18 @@ public class UserServiceImpl implements UserDetailsService, UserService{
                 user.getAuthorities());
     }
 
-
     @Transactional
     @Override
     public Boolean saveUser(UserCreateDTO userCreateDTO) {
         log.info("REQUEST:{}" ,userCreateDTO);
+        Optional<User> checkUsername = userRepository.findOneByUsernameAndIsEnabled(userCreateDTO.getUsername() , true);
+        if(checkUsername.isPresent()){
+            throw new AjoException("Username sudah terdaftar");
+        }
 
         String error = userValidator.checkReqUser(userCreateDTO);
         if(error != null){
             throw new AjoException(error);
-        }
-
-        if(userCreateDTO.getEmail() != null && !userCreateDTO.getEmail().trim().isEmpty()){
-            Boolean validateEamil = userValidator.validateEmailFormat(userCreateDTO.getEmail());
-            if(!validateEamil){
-                throw new AjoException("Format email tidak benar");
-            }
-        }
-
-        if(!userCreateDTO.getRoles().get(0).getStatus().equals(Constants.RoleStatus.ACTIVE)){
-            throw new AjoException("Silahkan hubungi BANK ADMIN 1 , user group ini sedang di modifikasi");
-        }
-
-        if(userCreateDTO.getRoles().isEmpty()){
-            throw new AjoException("Role tidak boleh kosong");
         }
 
         if(userCreateDTO.getRoles().get(0).getName().equals(Constants.Role.TRO_CHECKER)){
@@ -123,64 +114,41 @@ public class UserServiceImpl implements UserDetailsService, UserService{
             }
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userLogin= authentication.getName();
-        Optional<User> users = userRepository.findOneByUsernameAndIsEnabled(userLogin,true);
-        User userCreator = users.get();
-        String validateRole = userCreator.getRoles().get(0).getCode();
-        Beneficiary beneficiary1 = null;
-        if(userCreateDTO.getBeneficiaryId() != null){
-            Optional<Beneficiary> beneficiary = beneficiaryRepository.findById(userCreateDTO.getBeneficiaryId());
-             beneficiary1 = beneficiary.get();
-        }
-
-        List<Role> roleList = userValidator.checkRoles(userCreateDTO.getRoles());
-        if(!validateRole.equals(roleList.get(0).getRoleCreate()) || roleList.isEmpty()){
-            throw new AjoException("Role Anda tidak memiliki autorisasi");
-        }
-
-        User user = new User();
-        if (userCreateDTO.getId() == null){
-            Optional<MasterConfiguration> masterConfiguration = masterConfigurationRepository.findTop1ByStatusOrderByCreationDateDesc("ACTIVE");
+        Optional<MasterConfiguration> masterConfiguration = masterConfigurationRepository.findTop1ByStatusOrderByCreationDateDesc("ACTIVE");
+        String encryptedPassword = null;
+        if(userCreateDTO.getRoles().get(0).getName().equalsIgnoreCase(Constants.Role.NASABAH)){
+            encryptedPassword = new BCryptPasswordEncoder().encode(userCreateDTO.getPassword());
+        }else{
             if(!masterConfiguration.isPresent()){
                 throw new AjoException("Default password belum tersedia ,  silahkan hubungi Super Admin");
             }
-            String encryptedPassword = new BCryptPasswordEncoder().encode(masterConfiguration.get().getPassword());
+            encryptedPassword = new BCryptPasswordEncoder().encode(masterConfiguration.get().getPassword());;
+        }
+        List<Role> roleList = userValidator.checkRoles(userCreateDTO.getRoles());
+
+        User user = new User();
+        if (userCreateDTO.getId() == null){
             user.setPassword(encryptedPassword);
             user.setEnabled(true);
-            user.setStatus(Constants.UserStatus.CREATE_NEW);
+            user.setStatus(userCreateDTO.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.NASABAH) ? Constants.UserStatus.APPROVE_NEW : Constants.UserStatus.CREATE_NEW);
             user.setSignature(userCreateDTO.getSignature());
-
+            user.setIsExternal(userCreateDTO.getIsExternal());
             //user external
-            if(validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_1)){
-                user.setIsExternal(Boolean.TRUE);
-                user.setBeneficiary(userCreator.getBeneficiary());
-                user.setPassword(encryptedPassword);
-            }else if(validateRole.equals(Constants.Role.BANK_ADMIN_2_MAKER)){
-                if(userCreateDTO.getBeneficiaryId() == null) throw new AjoException("Beneficiary wajib disi");
-                user.setBeneficiary(beneficiary1);
-                user.setPassword(encryptedPassword);
-                user.setIsExternal(Boolean.TRUE);
+            if(userCreateDTO.getBeneficiaryName() != null && !userCreateDTO.getBeneficiaryName().isEmpty()){
+                Optional<Beneficiary> beneficiary = beneficiaryRepository.findById(userCreateDTO.getBeneficiaryId());
+                user.setBeneficiary(beneficiary.get());
             }
-
-            if(validateRole.equals(Constants.Role.BANK_ADMIN_1_MAKER ) || validateRole.equals(Constants.Role.IT)){
-                user.setNeedApprovalOrReject(Constants.Role.BANK_ADMIN_1_CHECKER);
-            }else if(validateRole.equals(Constants.Role.BANK_ADMIN_2_MAKER)){
-                user.setNeedApprovalOrReject(Constants.Role.BANK_ADMIN_2_CHECKER);
-            }else if(validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_1)){
-                user.setNeedApprovalOrReject(Constants.Role.BENEFICIARY_ADMIN_2);
-            }
-
+            user.setNeedApprovalOrReject(Constants.Role.BANK_ADMIN_1_CHECKER);
             user.setRoles(roleList != null ? roleList : null);
             user.setIsFirstLogin(Boolean.TRUE);
-            user.setUpdateManualBy(userLogin);
+            user.setUpdateManualBy(authentication == null ? "nasabah" : authentication.getName());
             user.setEmail(userCreateDTO.getEmail());
             user.setUsername(userCreateDTO.getUsername());
             user.setPosition(userCreateDTO.getPosition());
             user.setFirstName(userCreateDTO.getFirstName());
-
-            Optional<User> checkUsername = userRepository.findOneByUsernameAndIsEnabled(userCreateDTO.getUsername() , true);
-            if(checkUsername.isPresent()){
-                throw new AjoException("Username sudah terdaftar");
+            if(userCreateDTO.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.NASABAH)){
+                user.setApprovedDate(Instant.now());
+                user.setApprovedBy("CSACHK");
             }
             User userSaved = userRepository.save(user);
 
@@ -188,7 +156,7 @@ public class UserServiceImpl implements UserDetailsService, UserService{
             passwordHistory.setPassword(encryptedPassword);
             passwordHistory.setUser(userSaved);
             passwordHistoryRepository.save(passwordHistory);
-            userUtil.userHistory(userSaved, userLogin,Constants.action.CREATED_USER_BY_MAKER, null);
+            userUtil.userHistory(userSaved, (authentication == null ? "nasabah" : authentication.getName()),Constants.action.CREATED_USER_BY_MAKER, null);
 
             //TODO AUDIT TRAIL
             auditTrailUtil.saveAudit(
@@ -197,19 +165,13 @@ public class UserServiceImpl implements UserDetailsService, UserService{
                     null,
                     new JSONObject(user).toString(),
                     Constants.Remark.CREATE_USER_WAITING_APPROVAL,
-                    authentication.getName()
+                    (authentication == null ? "nasabah" : authentication.getName())
             );
 
         }else {
             User updateUser = userRepository.findById(userCreateDTO.getId())
                     .orElseThrow(() -> new EntityNotFoundException("User Not Found"));
             User oldUser = (User) SerializationUtils.clone(updateUser);
-            Optional<User> checkUsername = userRepository.findOneByUsernameAndIsEnabled(userCreateDTO.getUsername() , true);
-            if (checkUsername.isPresent()) {
-                if (checkUsername.get().getId() != updateUser.getId()) {
-                    throw new AjoException("Username sudah terdaftar");
-                }
-            }
             updateUser.setUsername(userCreateDTO.getUsername());
             updateUser.setFirstName(userCreateDTO.getFirstName());
             updateUser.setEmail(userCreateDTO.getEmail());
@@ -218,27 +180,16 @@ public class UserServiceImpl implements UserDetailsService, UserService{
             updateUser.setSignature(userCreateDTO.getSignature());
             updateUser.setRoles(roleList != null ? roleList : null);
             updateUser.setPosition(userCreateDTO.getPosition());
-            updateUser.setUpdateManualBy(userLogin);
-
+            updateUser.setUpdateManualBy(authentication.getName());
+            updateUser.setIsExternal(userCreateDTO.getIsExternal());
             //user external
-            if(validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_1)){
-                updateUser.setIsExternal(Boolean.TRUE);
-                updateUser.setBeneficiary(userCreator.getBeneficiary());
-            }else if(validateRole.equals(Constants.Role.BANK_ADMIN_2_MAKER)){
-                updateUser.setBeneficiary(beneficiary1);
-                updateUser.setIsExternal(Boolean.TRUE);
+            if(userCreateDTO.getBeneficiaryName() != null && !userCreateDTO.getBeneficiaryName().isEmpty()){
+                Optional<Beneficiary> beneficiary = beneficiaryRepository.findById(userCreateDTO.getBeneficiaryId());
+                user.setBeneficiary(beneficiary.get());
             }
-
-            if(validateRole.equals(Constants.Role.BANK_ADMIN_1_MAKER)){
-                updateUser.setNeedApprovalOrReject(Constants.Role.BANK_ADMIN_1_CHECKER);
-            }else if(validateRole.equals(Constants.Role.BANK_ADMIN_2_MAKER)){
-                updateUser.setNeedApprovalOrReject(Constants.Role.BANK_ADMIN_2_CHECKER);
-            }else if(validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_1)){
-                updateUser.setNeedApprovalOrReject(Constants.Role.BENEFICIARY_ADMIN_2);
-            }
-
+            updateUser.setNeedApprovalOrReject(Constants.Role.BANK_ADMIN_1_CHECKER);
             User userSaved =  userRepository.save(updateUser);
-            userUtil.userHistory(userSaved, userLogin,Constants.action.CREATED_USER_BY_MAKER, null);
+            userUtil.userHistory(userSaved, authentication.getName(),Constants.action.CREATED_USER_BY_MAKER, null);
 
             //TODO AUDIT TRAIL
             auditTrailUtil.saveAudit(
@@ -252,6 +203,67 @@ public class UserServiceImpl implements UserDetailsService, UserService{
         }
 
         return Boolean.TRUE;
+    }
+
+    @Override
+    public Optional<UserNasabahDTO> loadUserNasabahByUsername(String username){
+        UserNasabahDTO userNasabahDTO = new UserNasabahDTO();
+        Optional<UserNasabah> userNasabah = userNasabahRepository.findDistinctTopByUsername(username);
+        if (userNasabah.isPresent()){
+            userNasabahDTO = UserNasabahMapper.INSTANCE.toDto(userNasabah.get(), userNasabahDTO);
+            List<NasabahSupportDocument> nasabahSupportDocuments = nasabahSupportDocumentRepository.findByUserNasabahAndIsDeleted(userNasabah.get(), Boolean.FALSE);
+            if (nasabahSupportDocuments.size() > 0){
+                log.info("INSERT");
+                log.info(nasabahSupportDocuments.toString());
+                List<SupportDocumentNasabahDTO> supportDocumentNasabahDTOS = new ArrayList<>();
+                nasabahSupportDocuments.forEach(entity -> {
+                    SupportDocumentNasabahDTO dto = NasabahSupportDocumentMapper.INSTANCE.toDto(entity, new SupportDocumentNasabahDTO());
+                    supportDocumentNasabahDTOS.add(dto);
+                });
+                log.info(supportDocumentNasabahDTOS.toString());
+                userNasabahDTO.setSupportDocumentNasabahList(supportDocumentNasabahDTOS);
+            }
+        }
+        return Optional.ofNullable(userNasabahDTO);
+    }
+    @Transactional
+    @Override
+    public Boolean saveUserNasabah(UserNasabahDTO userNasabahDTO){
+        if(userNasabahDTO.getId() != null){
+            Optional<UserNasabah> userNasabah = userNasabahRepository.findById(userNasabahDTO.getId());
+            if(userNasabah.isPresent()){
+                UserNasabah userNasabahExist = userNasabah.get();
+                userNasabahExist = UserNasabahMapper.INSTANCE.toEntity(userNasabahDTO, userNasabahExist);
+                List<NasabahSupportDocument> documentNasabahExist = nasabahSupportDocumentRepository.findByUserNasabahAndIsDeleted(userNasabahExist, Boolean.FALSE);
+                if(documentNasabahExist != null && documentNasabahExist.size() > 0){
+                    documentNasabahExist.forEach(existData -> {
+                        nasabahSupportDocumentRepository.deleteById(existData.getId());
+                    });
+                }
+                if(userNasabahDTO.getSupportDocumentNasabahList().size() > 0){
+                    UserNasabah finalUserNasabahExist = userNasabahExist;
+                    userNasabahDTO.getSupportDocumentNasabahList().forEach(dto -> {
+                        NasabahSupportDocument entity = NasabahSupportDocumentMapper.INSTANCE.toEntity(dto, new NasabahSupportDocument());
+                        entity.setUserNasabah(finalUserNasabahExist);
+                        entity.setIsDeleted(Boolean.FALSE);
+                        nasabahSupportDocumentRepository.save(entity);
+                    });
+                }
+                userNasabahRepository.save(userNasabahExist);
+            }else{
+                UserNasabah userNasabahNew = userNasabahRepository.save(UserNasabahMapper.INSTANCE.toEntity(userNasabahDTO, new UserNasabah()));
+                if(userNasabahDTO.getSupportDocumentNasabahList().size() > 0){
+                    userNasabahDTO.getSupportDocumentNasabahList().forEach(dto -> {
+                        NasabahSupportDocument entity = NasabahSupportDocumentMapper.INSTANCE.toEntity(dto, new NasabahSupportDocument());
+                        entity.setUserNasabah(userNasabahNew);
+                        entity.setIsDeleted(Boolean.FALSE);
+                        nasabahSupportDocumentRepository.saveAndFlush(entity);
+                    });
+                }
+
+            }
+        }
+        return true;
     }
 
     @Transactional
@@ -398,44 +410,20 @@ public class UserServiceImpl implements UserDetailsService, UserService{
     @Transactional(readOnly = true)
     public List<UserListDTO> findAllUser(String status) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userLogin= authentication.getName();
-        Optional<User> users = userRepository.findOneByUsernameAndIsEnabled(userLogin,true);
-        User userLoggedIn = users.get();
-        String validateRole = userLoggedIn.getRoles().get(0).getCode();
+        Optional<User> users = userRepository.findOneByUsernameAndIsEnabled(authentication.getName(),true);
+        String validateRole = users.get().getRoles().get(0).getCode();
         List<User> userList = null;
 
         if (status == null || status == "" || status.equalsIgnoreCase("null")){
-            if(validateRole.equals(Constants.Role.BANK_ADMIN_2_MAKER)){
-                userList = userRepository.getUserListBenfMaker(validateRole);
-            }
-            else if(validateRole.equals(Constants.Role.BANK_ADMIN_2_CHECKER)){
-                userList = userRepository.getUserListBenfChecker(Constants.Role.BANK_ADMIN_2_MAKER);
-            }
-            else if(validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_1) ){
-                userList = userRepository.getUserListExternalMaker(validateRole, userLoggedIn.getBeneficiary());
-            } else if(validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_2) ){
-                userList = userRepository.getUserListExternalChecker(Constants.Role.BENEFICIARY_ADMIN_1, userLoggedIn.getBeneficiary());
-            } else if(validateRole.equals(Constants.Role.BANK_ADMIN_1_MAKER)){
+            if(validateRole.equals(Constants.Role.BANK_ADMIN_1_MAKER)){
                 userList = userRepository.getUserListMaker(validateRole);
-            }
-            else if(validateRole.equals(Constants.Role.BANK_ADMIN_1_CHECKER)){
-                userList = userRepository.getUserListChecker(Constants.Role.BANK_ADMIN_1_MAKER);
-            }
-            else{
+            }else{
                 userList = userRepository.getUserList(validateRole);
             }
         }else {
-            if(validateRole.equals(Constants.Role.BANK_ADMIN_2_MAKER)
-                    || validateRole.equals(Constants.Role.BANK_ADMIN_2_CHECKER)){
-                userList = userRepository.getUserListGlobalDashboard(Constants.Role.BANK_ADMIN_2_MAKER, status);
-            }else if(validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_2)
-                    || validateRole.equals(Constants.Role.BENEFICIARY_ADMIN_1)){
-                userList = userRepository.getUserListBeneficiaryDashboard(validateRole, userLoggedIn.getBeneficiary(), status);
-            }else if(validateRole.equals(Constants.Role.BANK_ADMIN_1_MAKER)
+            if(validateRole.equals(Constants.Role.BANK_ADMIN_1_MAKER)
                     || validateRole.equals(Constants.Role.BANK_ADMIN_1_CHECKER)){
                 userList = userRepository.getUserListGlobalDashboard(Constants.Role.BANK_ADMIN_1_MAKER, status);
-            }else if (validateRole.equals(Constants.Role.IT)){
-                userList = userRepository.getUserListITDashboard(validateRole, status, authentication.getName());
             }else{
                 throw new BadRequestAlertException("Status Not Valid","","");
             }

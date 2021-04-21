@@ -30,7 +30,6 @@
 		<javamail-version>1.5.5</javamail-version>
 		<common.net.version>3.6</common.net.version>
 		<mock.ftp.version>2.7.1</mock.ftp.version>
-		<ojdbc.version>12.2.0.1</ojdbc.version>
 	</properties>
 
 	<dependencies>
@@ -104,11 +103,6 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc8</artifactId>
-			<version>${ojdbc.version}</version>
 		</dependency>
 		<!--<dependency>-->
 			<!--<groupId>com.zaxxer</groupId>-->

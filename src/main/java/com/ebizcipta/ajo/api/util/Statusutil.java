@@ -34,9 +34,6 @@ public class Statusutil {
     @Value("${role.beneficiary.user.name}")
     private String roleBeneficiaryUser;
 
-    @Value("${role.super.name}")
-    private String roleIt;
-
     @Autowired
     private RegistrationRepository registrationRepository;
     @Autowired

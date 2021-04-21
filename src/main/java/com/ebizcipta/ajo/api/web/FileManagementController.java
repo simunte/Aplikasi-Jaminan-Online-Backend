@@ -45,6 +45,15 @@ public class FileManagementController {
                 .body(fileManagementDTO);
     }
 
+    @PreAuthorize("@hasPrivilege.checkPrivilege('Bank Guarantee_READ')")
+    @PostMapping("/dokumen/pendukung")
+    @ApiOperation("upload Supported File")
+    public ResponseEntity<FileManagementDTO> uploadFileSupported(MultipartFile file){
+        FileManagementDTO fileManagementDTO = fileManagementService.uploadSupportDocument(file);
+        return ResponseEntity.ok()
+                .body(fileManagementDTO);
+    }
+
     @PreAuthorize("@hasPrivilege.checkPrivilege('Bank Guarantee_READ,Report - Recapitulation_READ,Report - Verification_READ,Report - Settlement_READ,Manual Data Transfer_READ,User Access Management - User Access_READ')")
     @GetMapping("/file/download")
     @ApiOperation("download File")
@@ -53,6 +62,14 @@ public class FileManagementController {
         auditTrailUtil.printLogDetailStartTime(Constants.ExecutionType.START_EXECUTION, "File Management", "downloadFile");
         fileManagementService.downloadFile(response, fileName);
         auditTrailUtil.printLogDetailStartTime(Constants.ExecutionType.END_EXECUTION, "File Management", "downloadFile");
+    }
+
+    @PreAuthorize("@hasPrivilege.checkPrivilege('Bank Guarantee_READ')")
+    @GetMapping("/file/download/nasabah")
+    @ApiOperation("download File Nasabah")
+    public void downloadFileNasabah(HttpServletResponse response,
+                             @RequestParam("fileUrl") String fileUrl) throws IOException {
+        fileManagementService.downloadFileNasabah(response, fileUrl);
     }
 
     @PreAuthorize("@hasPrivilege.checkPrivilege('Bank Guarantee_READ,Report - Recapitulation_READ,Report - Verification_READ,Report - Settlement_READ,Manual Data Transfer_READ,User Access Management - User Access_READ')")

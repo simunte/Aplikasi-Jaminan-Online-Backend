@@ -1,16 +1,16 @@
 server:
-  ssl:
-      key-alias: 1
-      key-password: SWLE7B4J4J
-      key-store: keystore/LXAJOPIDV011_server.jks
-      key-store-provider: SUN
-      key-store-type: JKS
+  #ssl:
+      #key-alias: 1
+      #key-password: SWLE7B4J4J
+      #key-store: keystore/LXAJOPIDV011_server.jks
+      #key-store-provider: SUN
+      #key-store-type: JKS
   port: ${SERVER_PORT:8083}
 
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOSTNAME:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:UOB}?useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: jdbc:mysql://${MYSQL_HOSTNAME:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:DATABASE_AJO}?useLegacyDatetimeCode=false&serverTimezone=UTC
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:welcome1}
   jpa:
@@ -27,7 +27,7 @@ spring:
       max-request-size: 5MB
       
 security:
-  require-ssl: true
+  #require-ssl: true
   security-realm: ${SECURITY_REALM:Java Base}
   keystore-password: ${KEYSTORE_PASSWORD:Welcome1!}
   jwt:

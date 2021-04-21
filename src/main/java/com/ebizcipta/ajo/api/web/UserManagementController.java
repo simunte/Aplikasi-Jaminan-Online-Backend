@@ -204,4 +204,22 @@ public class UserManagementController {
         auditTrailUtil.printLogDetailStartTime(Constants.ExecutionType.END_EXECUTION, "User Management", "userHistoryDTOResponseEntity");
         return ResponseEntity.ok().body(result);
     }
+
+    @PreAuthorize("@hasPrivilege.checkPrivilege('Home_READ')")
+    @PostMapping("/nasabah")
+    @ApiOperation("save User nasabah detail")
+    public ResponseEntity<Boolean> saveUserNasabah(@Valid @RequestBody UserNasabahDTO dto) throws URISyntaxException {
+        Boolean result = userService.saveUserNasabah(dto);
+        return ResponseEntity.created(new URI("/api/v1/users"+dto.getUsername()))
+                .body(result);
+    }
+
+    @PreAuthorize("@hasPrivilege.checkPrivilege('Home_READ')")
+    @GetMapping("/nasabah/{username}")
+    @ApiOperation("get Users By Username")
+    public ResponseEntity<Optional<UserNasabahDTO>> getNasabah(@PathVariable String username) {
+        Optional<UserNasabahDTO> result = userService.loadUserNasabahByUsername(username);
+        return ResponseEntity.ok()
+                .body(result);
+    }
 }

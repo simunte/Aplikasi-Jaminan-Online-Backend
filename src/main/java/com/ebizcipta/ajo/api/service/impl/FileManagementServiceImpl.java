@@ -44,6 +44,9 @@ public class FileManagementServiceImpl implements FileManagementService{
     @Value("${file.directory.parent}")
     String parentDirectory;
 
+    @Value("${file.directory.support-document}")
+    String supportDocumentNasabah;
+
     @Value("${file.directory.pdf}")
     String pdfUploadDirectory;
 
@@ -75,6 +78,27 @@ public class FileManagementServiceImpl implements FileManagementService{
     @Autowired
     private CurrencyUtil currency;
 
+
+    @Transactional
+    @Override
+    public FileManagementDTO uploadSupportDocument(MultipartFile file){
+        UUID nameFile = UUID.randomUUID();
+        String newFileName = nameFile.toString() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
+        String finalUrl = parentDirectory + supportDocumentNasabah + newFileName;
+        try {
+            byte[] fileByte = file.getBytes();
+            Path path = Paths.get(finalUrl);
+            Files.write(path, fileByte);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        FileManagementDTO fileManagementDTO = new FileManagementDTO();
+        fileManagementDTO.setInputFileName(file.getName());
+        fileManagementDTO.setOriginalFileName(file.getOriginalFilename());
+        fileManagementDTO.setNewFileName(newFileName);
+        fileManagementDTO.setFileSaveUrl(finalUrl);
+        return fileManagementDTO;
+    }
     @Override
     @Transactional
     public FileManagementDTO uploadFile(MultipartFile file , String type, Long idJaminan, String codeJaminan, Long tanggalTerbit){
@@ -138,6 +162,23 @@ public class FileManagementServiceImpl implements FileManagementService{
     @Transactional
     public void downloadFile(HttpServletResponse response, String fileName) throws IOException {
         File myfile = new File(parentDirectory + pdfUploadDirectory +fileName);
+        response.setHeader("Content-Disposition", "filename=" + myfile.getName());
+        OutputStream outputStream = response.getOutputStream();
+        FileInputStream fileInputStream = new FileInputStream(myfile);
+        byte[] fileByte = new byte[(int) myfile.length()];
+        int length;
+        while((length = fileInputStream.read(fileByte)) > 0){
+            outputStream.write(fileByte, 0, length);
+        }
+        fileInputStream.close();
+        outputStream.flush();
+//        return fileByte;
+    }
+
+    @Override
+    @Transactional
+    public void downloadFileNasabah(HttpServletResponse response, String fileUrl) throws IOException {
+        File myfile = new File(fileUrl);
         response.setHeader("Content-Disposition", "filename=" + myfile.getName());
         OutputStream outputStream = response.getOutputStream();
         FileInputStream fileInputStream = new FileInputStream(myfile);

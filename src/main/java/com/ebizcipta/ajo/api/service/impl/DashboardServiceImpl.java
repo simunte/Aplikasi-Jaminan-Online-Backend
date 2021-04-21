@@ -80,6 +80,13 @@ public class DashboardServiceImpl implements DashboardService{
                 || role.get().getCode().equalsIgnoreCase(Constants.Role.BANK_ADMIN_1_CHECKER)){
             dashboardITDTO.setDashboardUser(getDashboardUserAccess(listStatusUser, role));
             dashboardITDTO.setDashboardUserGroup(getDashboardUserGroup(listStatusUser, role));
+            dashboardITDTO.setDashboardAlamatBankPenerbit(getDashboardAlamatBankPenerbit(listMasterStatus, role));
+            dashboardITDTO.setDashboardBeneficiary(getDashboardBeneficiary(listMasterStatus, role));
+            dashboardITDTO.setDashboardCurrency(getDashboardCurrency(listMasterStatus, role));
+            dashboardITDTO.setDashboardJenisJaminan(getDashboardJenisJaminan(listMasterStatus, role));
+            dashboardITDTO.setDashboardJenisProduk(getDashboardJenisProduk(listMasterStatus, role));
+            dashboardITDTO.setDashboardUnitPengguna(getDashboardUnitPengguna(listMasterStatus, role));
+            dashboardITDTO.setDashboardMasterConfiguration(getDashboardMasterConfigurasi(listMasterStatus, role));
         }else {
             dashboardITDTO.setDashboardUser(getDashboardUserAccess(listStatusUser, role));
         }

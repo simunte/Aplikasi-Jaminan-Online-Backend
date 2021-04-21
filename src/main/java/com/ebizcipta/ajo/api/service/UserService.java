@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface UserService {
     Boolean saveUser(UserCreateDTO userCreateDTO);
+    Boolean saveUserNasabah(UserNasabahDTO userNasabahDTO);
+    Optional <UserNasabahDTO> loadUserNasabahByUsername(String username);
     Boolean deleteUser(Integer[] userId);
 
 

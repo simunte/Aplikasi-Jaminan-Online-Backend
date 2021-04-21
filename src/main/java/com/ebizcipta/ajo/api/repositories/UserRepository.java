@@ -25,7 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findTop1ByUsernameAndApprovedDateIsNotNullAndStatusNotOrderByCreationDateDesc(String username, String status);
 
-
     @Query(value = "SELECT * from users u \n" +
             "join user_role ur on u.id=ur.user_id \n" +
             "join role r on r.id=ur.role_id where r.role_create=:role " +

@@ -43,6 +43,13 @@ public class UserValidator {
             errorMsg = "Username wajib disi";
         }else if(userCreateDTO.getRoles() == null || userCreateDTO.getRoles().isEmpty()) {
             errorMsg = "Role wajib disi";
+        }else if(userCreateDTO.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.NASABAH) && userCreateDTO.getEmail() == null){
+            errorMsg = "Email tidak boleh kosong";
+        }
+        else if(userCreateDTO.getEmail() != null && !userCreateDTO.getEmail().trim().isEmpty() && !this.validateEmailFormat(userCreateDTO.getEmail())){
+            errorMsg = "Format email tidak benar";
+        }else if(userCreateDTO.getRoles().isEmpty()){
+            errorMsg = "Role tidak boleh kosong";
         }
         return errorMsg;
     }
