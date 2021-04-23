@@ -89,10 +89,10 @@ public class ServiceSchedulerUtil{
         List<Registration> registrationList = registrationRepository.findByTglKirimAbgLessThanAndBgStatus(dateToVerified, Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION);
         registrationList.forEach(registration -> {
             Registration oldRegistration = (Registration) SerializationUtils.clone(registration);
-            registration.setBgStatus(Constants.BankGuaranteeStatus.VERIFIEDBG);
+            registration.setBgStatus(Constants.BankGuaranteeStatus.APPROVEDBG);
             registration.setModifiedBy("System/Ops");
             registrationRepository.save(registration);
-            savehistoryTransaction(registration.getId(), Constants.BankGuaranteeStatus.VERIFIEDBG, null);
+            savehistoryTransaction(registration.getId(), Constants.BankGuaranteeStatus.APPROVEDBG, null);
 
             //TODO AUDIT TRAIL BG REGISTRATION SET STATUS AUTO VERIFIED
             auditTrailUtil.saveAudit( Constants.Event.UPDATE , Constants.Module.REGISTRATION, new JSONObject(oldRegistration).toString(),new JSONObject(registration).toString(), Constants.Remark.UPDATE_REGISTRATION_BG_VERIFIED_AUTO_SCHEDULER,"System/Ops" );
@@ -105,7 +105,7 @@ public class ServiceSchedulerUtil{
     public Boolean autoSettledScheduler(){
         Date dateToSettled = dateUtil.addDays(new Date(), -29);
         log.info("Start Auto Settled Scheduler for "+dateToSettled);
-        List<Registration> registrationList = registrationRepository.findByTanggalBatasClaimLessThanAndBgStatus(dateToSettled.getTime(), Constants.BankGuaranteeStatus.VERIFIEDBG);
+        List<Registration> registrationList = registrationRepository.findByTanggalBatasClaimLessThanAndBgStatus(dateToSettled.getTime(), Constants.BankGuaranteeStatus.APPROVEDBG);
         registrationList.forEach(registration -> {
             Registration registrationTop = registrationRepository.findTop1ByNomorJaminanAndBgStatusInOrderByNomorAmentmendDesc(registration.getNomorJaminan(), Statusutil.getStatusCheckerSettlement())
                     .orElseThrow(()->new BadRequestAlertException("Nomor Jaminan Tidak ditemukan","",""));
@@ -131,7 +131,7 @@ public class ServiceSchedulerUtil{
     public Boolean autoExpiredScheduler(){
         Date dateToExpired = dateUtil.addDays(new Date(), -364);
         log.info("Start Auto Expired Scheduler for "+dateToExpired);
-        List<Registration> registrationList = registrationRepository.findByTanggalBatasClaimLessThanAndBgStatus(dateToExpired.getTime(), Constants.BankGuaranteeStatus.VERIFIEDBG);
+        List<Registration> registrationList = registrationRepository.findByTanggalBatasClaimLessThanAndBgStatus(dateToExpired.getTime(), Constants.BankGuaranteeStatus.APPROVEDBG);
         registrationList.forEach(registration -> {
             Registration oldRegistration = (Registration) SerializationUtils.clone(registration);
             registration.setBgStatus(Constants.BankGuaranteeStatus.EXPIRED_BG);

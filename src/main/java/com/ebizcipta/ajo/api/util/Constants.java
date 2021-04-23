@@ -35,11 +35,11 @@ public class Constants {
         public static final String BGFROMSTAGING = "BG FROM STAGING";
         public static final String DRAFT = "PENDING BG";
         public static final String WAITINGBGAPPROVAL = "WAITING FOR APPROVAL";
+        public static final String WAITINGBGVERIFICATION = "WAITING FOR VERIFICATION";
+        public static final String WAITINGBGVALIDATION = "WAITING FOR VALIDATION";
+        public static final String WAITINGBGCONFIRMATION = "WAITING FOR CONFIRMATION";
         public static final String APPROVEDBG = "APPROVED BG";
         public static final String REJECT = "REJECTED BG";
-        public static final String WAITINGBGVERIFICATION = "WAITING FOR VERIFICATION";
-        public static final String WAITINGCHECKERVERIFICATION = "WAITING CHECKER VERIFICATION";
-        public static final String VERIFIEDBG = "VERIFIED BG";
         public static final String FAILED_BG = "FAILED";
         public static final String WAITINGBGSETTLEMENT = "WAITING CHECKER SETTLEMENT";
         public static final String SETTLEDBG = "SETTLED BG";
@@ -80,9 +80,11 @@ public class Constants {
     }
     public static class registrationAction{
         public static final String APPROVE = "APPROVAL";
-        public static final String REJECT = "REJECTION";
         public static final String VERIFIKASI = "VERIFICATION";
+        public static final String VALIDASI = "VALIDATION";
+        public static final String CONFIRM = "CONFIRMATION";
         public static final String SETTLEMENT = "SETTLEMENT";
+        public static final String REJECT = "REJECTION";
     }
 
     public static class Role{

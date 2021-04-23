@@ -25,11 +25,17 @@ import java.util.stream.Collectors;
 @Component
 @PropertySource("classpath:data.properties")
 public class Statusutil {
+    @Value("${role.nsb.name}")
+    private String roleNasabah;
+
     @Value("${role.tro.maker.name}")
     private String roleTroMaker;
 
     @Value("${role.tro.checker.name}")
     private String roleTroChecker;
+
+    @Value("${role.reviewer.name}")
+    private String roleKomite;
 
     @Value("${role.beneficiary.user.name}")
     private String roleBeneficiaryUser;
@@ -44,19 +50,13 @@ public class Statusutil {
                 Constants.BankGuaranteeStatus.BGFROMSTAGING,
                 Constants.BankGuaranteeStatus.DRAFT,
                 Constants.BankGuaranteeStatus.REJECT,
-                Constants.BankGuaranteeStatus.APPROVEDBG,
-                Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
-                Constants.BankGuaranteeStatus.VERIFIEDBG);
+                Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL);
     }
 
     public static List<String> getStatusRoleTroChecker(){
         return Arrays.asList(
-                Constants.BankGuaranteeStatus.BGFROMSTAGING,
-                Constants.BankGuaranteeStatus.DRAFT,
-                Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL,
-                Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION,
-                Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT,
-                Constants.BankGuaranteeStatus.REJECT);
+                Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
+                Constants.BankGuaranteeStatus.APPROVEDBG);
     }
 
     public static List<String> getStatusRoleTroCheckerDeleteBg(){
@@ -69,35 +69,34 @@ public class Statusutil {
 
     public static List<String> getStatusRolePlnUser(){
         return Arrays.asList(
-                Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
-                Constants.BankGuaranteeStatus.VERIFIEDBG);
+                Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION,
+                Constants.BankGuaranteeStatus.APPROVEDBG);
     }
 
     public static List<String> getStatusRolePlnUserRekapitulasi(){
         return Arrays.asList(
                 Constants.BankGuaranteeStatus.APPROVEDBG,
                 Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
-                Constants.BankGuaranteeStatus.VERIFIEDBG,
+                Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION,
                 Constants.BankGuaranteeStatus.SETTLEDBG);
     }
 
     public static List<String> getStatusRolePlnUserVerifikasi(){
         return Arrays.asList(
-                Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
-                Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION,
-                Constants.BankGuaranteeStatus.VERIFIEDBG);
+                Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION,
+                Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION);
     }
 
     public static List<String> getStatusRolePlnUserSettlement(){
         return Arrays.asList(
-                Constants.BankGuaranteeStatus.VERIFIEDBG,
+                Constants.BankGuaranteeStatus.APPROVEDBG,
                 Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT,
                 Constants.BankGuaranteeStatus.SETTLEDBG);
     }
 
     public static List<String> getStatusCheckerSettlement(){
         return Arrays.asList(
-                Constants.BankGuaranteeStatus.VERIFIEDBG,
+                Constants.BankGuaranteeStatus.APPROVEDBG,
                 Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT);
     }
 
@@ -106,25 +105,34 @@ public class Statusutil {
                 Constants.BankGuaranteeStatus.APPROVEDBG,
                 Constants.BankGuaranteeStatus.FAILED_BG);
     }
-    public static List<String> getStatusBankGuaranteeTRO(){
+
+    public static List<String> getStatusBankGuaranteeKomite(){
+        return Arrays.asList(
+                Constants.BankGuaranteeStatus.WAITINGBGVALIDATION,
+                Constants.BankGuaranteeStatus.APPROVEDBG,
+                Constants.BankGuaranteeStatus.SETTLEDBG);
+    }
+
+    public static List<String> getStatusBankGuaranteeTROMaker(){
         return Arrays.asList(
                 Constants.BankGuaranteeStatus.BGFROMSTAGING,
                 Constants.BankGuaranteeStatus.DRAFT,
                 Constants.BankGuaranteeStatus.REJECT,
-                Constants.BankGuaranteeStatus.APPROVEDBG,
                 Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL,
-                Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION,
+                Constants.BankGuaranteeStatus.SETTLEDBG);
+    }
+
+    public static List<String> getStatusBankGuaranteeTROChecker(){
+        return Arrays.asList(
                 Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
-                Constants.BankGuaranteeStatus.VERIFIEDBG,
-                Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT,
+                Constants.BankGuaranteeStatus.APPROVEDBG,
                 Constants.BankGuaranteeStatus.SETTLEDBG);
     }
 
     public static List<String> getStatusBankGuaranteeBeneficiaryUSser(){
         return Arrays.asList(
-                Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
+                Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION,
                 Constants.BankGuaranteeStatus.APPROVEDBG,
-                Constants.BankGuaranteeStatus.VERIFIEDBG,
                 Constants.BankGuaranteeStatus.SETTLEDBG);
     }
 
@@ -189,8 +197,14 @@ public class Statusutil {
     public List<String> findStatusBasedOnRoleForList(Role role){
         if (role.getCode().toUpperCase().equalsIgnoreCase(roleBeneficiaryUser)){
             return getStatusBankGuaranteeBeneficiaryUSser();
+        }else if(role.getCode().toUpperCase().equalsIgnoreCase(roleTroMaker)){
+            return getStatusBankGuaranteeTROMaker();
+        }else if(role.getCode().toUpperCase().equalsIgnoreCase(roleTroChecker)){
+            return getStatusBankGuaranteeTROChecker();
+        }else if(role.getCode().toUpperCase().equalsIgnoreCase(roleKomite)){
+            return getStatusBankGuaranteeKomite();
         }else {
-            return getStatusBankGuaranteeTRO();
+            return null;
         }
     }
 }

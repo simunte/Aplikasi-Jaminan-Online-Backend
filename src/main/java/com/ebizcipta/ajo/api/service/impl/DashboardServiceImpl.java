@@ -63,18 +63,10 @@ public class DashboardServiceImpl implements DashboardService{
         List<String> listStatusUser = statusutil.findStatusBasedOnRole(role.get());
         List<String> listMasterStatus = statusutil.getStatusForMasterDataRoleIt();
         DashboardITDTO dashboardITDTO = new DashboardITDTO();
-        if (role.get().getCode().equalsIgnoreCase(Constants.Role.IT)){
-            dashboardITDTO.setDashboardUser(getDashboardUserAccess(listStatusUser, role));
-            dashboardITDTO.setDashboardAlamatBankPenerbit(getDashboardAlamatBankPenerbit(listMasterStatus, role));
-            dashboardITDTO.setDashboardBeneficiary(getDashboardBeneficiary(listMasterStatus, role));
-            dashboardITDTO.setDashboardCurrency(getDashboardCurrency(listMasterStatus, role));
-            dashboardITDTO.setDashboardJenisJaminan(getDashboardJenisJaminan(listMasterStatus, role));
-            dashboardITDTO.setDashboardJenisProduk(getDashboardJenisProduk(listMasterStatus, role));
-            dashboardITDTO.setDashboardUnitPengguna(getDashboardUnitPengguna(listMasterStatus, role));
-            dashboardITDTO.setDashboardMasterConfiguration(getDashboardMasterConfigurasi(listMasterStatus, role));
-        }else if (role.get().getCode().equalsIgnoreCase(Constants.Role.TRO_MAKER)
+        if (role.get().getCode().equalsIgnoreCase(Constants.Role.TRO_MAKER)
                 || role.get().getCode().equalsIgnoreCase(Constants.Role.TRO_CHECKER)
-                || role.get().getCode().equalsIgnoreCase(Constants.Role.BENEFICIARY_USER)){
+                || role.get().getCode().equalsIgnoreCase(Constants.Role.BENEFICIARY_USER)
+                || role.get().getCode().equalsIgnoreCase(Constants.Role.NASABAH)){
             dashboardITDTO.setDashboardBankGaransi(getDashboardBankGaransi(listStatusUser, role));
         }else if (role.get().getCode().equalsIgnoreCase(Constants.Role.BANK_ADMIN_1_MAKER)
                 || role.get().getCode().equalsIgnoreCase(Constants.Role.BANK_ADMIN_1_CHECKER)){
@@ -247,13 +239,36 @@ public class DashboardServiceImpl implements DashboardService{
     public List<DashboardDTO> getDashboardBankGaransi(List<String> status, Optional<Role> role){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         List<DashboardDTO> dashboardDTOBankGaransi = new ArrayList<>();
-        for (int i=0; i<status.size();i++){
-            DashboardDTO dashboardDTO = new DashboardDTO();
-            List<Registration> registrations = registrationRepository.findByBgStatus(status.get(i));
-            if (registrations.size() > 0){
-                dashboardDTO.setStatus(status.get(i));
-                dashboardDTO.setJumlah(String.valueOf(registrations.size()));
-                dashboardDTOBankGaransi.add(dashboardDTO);
+        if(role.get().getCode().equalsIgnoreCase("NASABAH")){
+            Optional <User> user = userRepository.findOneByUsername(authentication.getName());
+            List<Registration> registrations = registrationRepository.findByNasabah(user.get());
+            for (int i = 0; i < registrations.size(); i++){
+                DashboardDTO dashboardDTO = new DashboardDTO();
+                int count = 1;
+                if(dashboardDTOBankGaransi.size() > 0){
+                    for (int y = 0; y < dashboardDTOBankGaransi.size(); y++){
+                        if(registrations.get(i).getBgStatus().equalsIgnoreCase(dashboardDTOBankGaransi.get(y).getStatus())){
+                            count++;
+                        }
+                        dashboardDTO.setStatus(registrations.get(i).getBgStatus());
+                        dashboardDTO.setJumlah(String.valueOf(count));
+                        dashboardDTOBankGaransi.add(dashboardDTO);
+                    }
+                }else {
+                    dashboardDTO.setStatus(registrations.get(i).getBgStatus());
+                    dashboardDTO.setJumlah(String.valueOf(count));
+                    dashboardDTOBankGaransi.add(dashboardDTO);
+                }
+            }
+        }else{
+            for (int i=0; i<status.size();i++){
+                DashboardDTO dashboardDTO = new DashboardDTO();
+                List<Registration> registrations = registrationRepository.findByBgStatus(status.get(i));
+                if (registrations.size() > 0){
+                    dashboardDTO.setStatus(status.get(i));
+                    dashboardDTO.setJumlah(String.valueOf(registrations.size()));
+                    dashboardDTOBankGaransi.add(dashboardDTO);
+                }
             }
         }
         return dashboardDTOBankGaransi;

@@ -43,36 +43,36 @@ public class BgRegistrationValidator {
     }
 
     public Boolean approvalVerifiedSettleActionValidation(ApprovalDTO approvalDTO, Optional<Registration> registration){
-        Boolean result = Boolean.FALSE;
-        if (registration.isPresent()){
-            if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.APPROVE)
-                    && !registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL)){
-                throw new BadRequestAlertException("Approval hanya berlaku jika status = waiting for approval","","");
-            }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.VERIFIKASI)){
-                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.APPROVEDBG)
-                        || registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION)
-                        || registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION)){
-                    result = Boolean.TRUE;
-                }else {
-                    throw new BadRequestAlertException("Verifikasi hanya berlaku jika status = waiting for verifikasi","","");
-                }
-            }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.SETTLEMENT)){
-                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.VERIFIEDBG)
-                        || registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT)){
-                    result = Boolean.TRUE;
-                }else {
-                    throw new BadRequestAlertException("Settlement hanya berlaku jika bg sudah di verifikasi","","");
-                }
-            }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.REJECT)
-                    && registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.REJECT)){
-                throw new BadRequestAlertException("BG Dengan Status "+registration.get().getBgStatus()+" Tidak Dapat di Reject","","");
-            }
-            else {
-                result = Boolean.TRUE;
-            }
-        }else {
-            throw new BadRequestAlertException("Nomor Jaminan Tidak ditemukan","","");
-        }
-        return  result;
+//        Boolean result = Boolean.FALSE;
+//        if (registration.isPresent()){
+//            if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.APPROVE)
+//                    && !registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL)){
+//                throw new BadRequestAlertException("Approval hanya berlaku jika status = waiting for approval","","");
+//            }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.VERIFIKASI)){
+//                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.APPROVEDBG)
+//                        || registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION)
+//                        || registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION)){
+//                    result = Boolean.TRUE;
+//                }else {
+//                    throw new BadRequestAlertException("Verifikasi hanya berlaku jika status = waiting for verifikasi","","");
+//                }
+//            }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.SETTLEMENT)){
+//                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.VERIFIEDBG)
+//                        || registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT)){
+//                    result = Boolean.TRUE;
+//                }else {
+//                    throw new BadRequestAlertException("Settlement hanya berlaku jika bg sudah di verifikasi","","");
+//                }
+//            }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.REJECT)
+//                    && registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.REJECT)){
+//                throw new BadRequestAlertException("BG Dengan Status "+registration.get().getBgStatus()+" Tidak Dapat di Reject","","");
+//            }
+//            else {
+//                result = Boolean.TRUE;
+//            }
+//        }else {
+//            throw new BadRequestAlertException("Nomor Jaminan Tidak ditemukan","","");
+//        }
+        return  Boolean.TRUE;
     }
 }

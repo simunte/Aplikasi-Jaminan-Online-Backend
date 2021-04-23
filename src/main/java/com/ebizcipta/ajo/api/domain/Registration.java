@@ -33,6 +33,9 @@ public class Registration extends Base{
     @ManyToOne
     @JoinColumn(name = "jenis_jaminan")
     private JenisJaminan jenisJaminan;
+	
+    @Column(name = "doc_jenis_jaminan")
+    private String docJenisJaminan;
 
     @ManyToOne
     @JoinColumn(name = "beneficiary")
@@ -54,6 +57,10 @@ public class Registration extends Base{
 
     private String applicant;
 
+    @ManyToOne
+    @JoinColumn(name = "nasabah")
+    private User nasabah;
+
     @Lob
     @Column(name = "uraian_pekerjaan")
     private String uraianPekerjaan;
@@ -64,6 +71,9 @@ public class Registration extends Base{
 
     @Column(name = "nilai_jaminan")
     private BigDecimal nilaiJaminan;
+	
+	@Column(name = "nilai_kontrak")
+    private BigDecimal nilaiKontrak;
 
     @Column(name = "tanggal_terbit")
     private Long tanggalTerbit;

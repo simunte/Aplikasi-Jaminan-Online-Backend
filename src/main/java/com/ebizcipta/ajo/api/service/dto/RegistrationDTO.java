@@ -25,6 +25,9 @@ public class RegistrationDTO {
 
     @JsonProperty(value = "jenis_jaminan_id")
     private Long jenisJaminanId;
+	
+	@JsonProperty(value = "doc_jenis_jaminan")
+    private String docJenisJaminan;
 
     @JsonProperty(value = "beneficiary_id")
     private Long beneficiaryId;
@@ -53,6 +56,9 @@ public class RegistrationDTO {
 
     @JsonProperty(value = "nilai_jaminan")
     private BigDecimal nilaiJaminan;
+	
+	@JsonProperty(value = "nilai_kontrak")
+    private BigDecimal nilaiKontrak;
 
     @JsonProperty(value = "tanggal_terbit")
     private Long tanggalTerbit;

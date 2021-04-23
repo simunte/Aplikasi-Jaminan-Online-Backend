@@ -86,7 +86,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> user = userRepository.findOneByUsernameAndIsEnabled(authentication.getName(), true);
         if (status == null || status == "" || status.equalsIgnoreCase("null")){
-            registrations = registrationRepository.findByBgStatusIn(statusutil.findStatusBasedOnRoleForList(user.get().getRoles().get(0)));
+            Role role = user.get().getRoles().get(0);
+            if(role.getCode().toUpperCase().equalsIgnoreCase("NASABAH")){
+                registrations = registrationRepository.findByNasabah(user.get());
+            }else{
+                registrations = registrationRepository.findByBgStatusIn(statusutil.findStatusBasedOnRoleForList(user.get().getRoles().get(0)));
+            }
         }else {
             registrations = registrationRepository.findByBgStatus(status);
         }
@@ -148,6 +153,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         registration.setBgStatus(Constants.BankGuaranteeStatus.DRAFT);
+        User user = userRepository.findOneByUsernameAndIsEnabled(dto.getApplicant(), Boolean.TRUE)
+                .orElseThrow(() -> new EntityNotFoundException("User tidak ditemukan"));
+        registration.setNasabah(user);
         JenisProduk jenisProduk = jenisProdukRepository.findById(dto.getJenisProdukId())
                 .orElseThrow(()-> new EntityNotFoundException("Jenis Produk Not Found"));
         registration.setJenisProduk(jenisProduk);
@@ -194,51 +202,117 @@ public class RegistrationServiceImpl implements RegistrationService {
         Optional<Registration> registration = registrationRepository.findById(approvalDTO.getIdJaminan());
         Registration oldRegistration = (Registration) SerializationUtils.clone(registration.get());
         bgRegistrationValidator.approvalVerifiedSettleActionValidation(approvalDTO, registration);
-        if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.APPROVE)){
-            if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.APPROVEDBG)){
-                throw new BadRequestAlertException("Tidak Dapat APPROVED BG dengan Status" + registration.get().getBgStatus(), "", "");
-            }
-            Confirmation confirmationLet = confirmationRepository.findByRegistration(registration.get())
-                    .orElseThrow(()->new BadRequestAlertException("Bank Guarantee Tidak ditemukan","",""));
-            //File Without Signature
-            Map<String, Object> mapFile = fileManagementService.exportSuratKonfirmasi(confirmationLet, Boolean.FALSE);
-            File file = (File) mapFile.get("file");
-            //File With Signature
-            Map<String, Object> mapFileTtd = fileManagementService.exportSuratKonfirmasi(confirmationLet, Boolean.TRUE);
-            File fileTtd = (File) mapFileTtd.get("file");
+        switch (approvalDTO.getAction().toUpperCase()){
+            case Constants.registrationAction.APPROVE:
+                if (!registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL)){
+                    throw new BadRequestAlertException("Tidak Dapat APPROVED BG dengan Status" + registration.get().getBgStatus(), "", "");
+                }
+                registration.get().setBgStatus(Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION);
+                registrationRepository.save(registration.get());
+                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION, approvalDTO.getNotes());
 
-            confirmationLet.setSoftCopySuratKonfirmasi(file.getName());
-            confirmationLet.setSoftCopySuratKonfirmasiWithTtd(fileTtd.getName());
-            confirmationRepository.save(confirmationLet);
+                //TODO AUDIT TRAIL
+                auditTrailUtil.saveAudit(
+                        Constants.Event.APPROVAL,
+                        Constants.Module.REGISTRATION,
+                        new JSONObject(oldRegistration).toString(),
+                        new JSONObject(registration).toString(),
+                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_APPROVED,
+                        authentication.getName()
+                );
+                break;
+            case Constants.registrationAction.VERIFIKASI:
+                if (!registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION)){
+                    throw new BadRequestAlertException("Tidak Dapat VERIFIKASI BG dengan Status " + registration.get().getBgStatus(), "", "");
+                }
+                Confirmation confirmationLet = confirmationRepository.findByRegistration(registration.get())
+                        .orElseThrow(()->new BadRequestAlertException("Bank Guarantee Tidak ditemukan","",""));
+                //File Without Signature
+                Map<String, Object> mapFile = fileManagementService.exportSuratKonfirmasi(confirmationLet, Boolean.FALSE);
+                File file = (File) mapFile.get("file");
+                //File With Signature
+                Map<String, Object> mapFileTtd = fileManagementService.exportSuratKonfirmasi(confirmationLet, Boolean.TRUE);
+                File fileTtd = (File) mapFileTtd.get("file");
 
-            registration.get().setApprovedDate(Instant.now());
-            registration.get().setApprovedBy(authentication.getName());
-            registration.get().setUserApprove(user);
-            registration.get().setBgStatus(Constants.BankGuaranteeStatus.APPROVEDBG);
-            registrationRepository.save(registration.get());
-            savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.APPROVEDBG, approvalDTO.getNotes());
+                confirmationLet.setSoftCopySuratKonfirmasi(file.getName());
+                confirmationLet.setSoftCopySuratKonfirmasiWithTtd(fileTtd.getName());
+                confirmationRepository.save(confirmationLet);
 
-            //TODO AUDIT TRAIL
-            auditTrailUtil.saveAudit(
-                    Constants.Event.APPROVAL,
-                    Constants.Module.REGISTRATION,
-                    new JSONObject(oldRegistration).toString(),
-                    new JSONObject(registration).toString(),
-                    Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_APPROVED,
-                    authentication.getName()
-            );
-        }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.REJECT)){
-            if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.REJECT)){
-                throw new BadRequestAlertException("Tidak Dapat REJECT BG dengan Status" + registration.get().getBgStatus(), "", "");
-            }
-            if (approvalDTO.getNotes().isEmpty() || approvalDTO.getNotes() == null){
-                throw new BadRequestAlertException("Komentar tidak boleh kosong", "", "");
-            }
-            if (user.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.BENEFICIARY_USER)){
-                sendEmailBeneficiaryRejected(registration, approvalDTO.getNotes());
-            }
-            try {
-                registration.get().setNotes(approvalDTO.getNotes());
+                registration.get().setApprovedDate(Instant.now());
+                registration.get().setApprovedBy(authentication.getName());
+                registration.get().setUserApprove(user);
+                registration.get().setBgStatus(Constants.BankGuaranteeStatus.WAITINGBGVALIDATION);
+                registrationRepository.save(registration.get());
+                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.WAITINGBGVALIDATION, approvalDTO.getNotes());
+
+                //TODO AUDIT TRAIL
+                auditTrailUtil.saveAudit(
+                        Constants.Event.APPROVAL,
+                        Constants.Module.REGISTRATION,
+                        new JSONObject(oldRegistration).toString(),
+                        new JSONObject(registration).toString(),
+                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_APPROVED,
+                        authentication.getName()
+                );
+                break;
+            case Constants.registrationAction.VALIDASI:
+                if (!registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGVALIDATION)){
+                    throw new BadRequestAlertException("Tidak Dapat VALIDASI BG dengan Status" + registration.get().getBgStatus(), "", "");
+                }
+                registration.get().setBgStatus(Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION);
+                registrationRepository.save(registration.get());
+                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION, approvalDTO.getNotes());
+
+                //TODO AUDIT TRAIL
+                auditTrailUtil.saveAudit(
+                        Constants.Event.APPROVAL,
+                        Constants.Module.REGISTRATION,
+                        new JSONObject(oldRegistration).toString(),
+                        new JSONObject(registration).toString(),
+                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_APPROVED,
+                        authentication.getName()
+                );
+                break;
+            case Constants.registrationAction.CONFIRM:
+                if (!registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION)){
+                    throw new BadRequestAlertException("Tidak Dapat KONFIRMASI BG dengan Status" + registration.get().getBgStatus(), "", "");
+                }
+                registration.get().setBgStatus(Constants.BankGuaranteeStatus.APPROVEDBG);
+                registrationRepository.save(registration.get());
+                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.APPROVEDBG, approvalDTO.getNotes());
+
+                //TODO AUDIT TRAIL
+                auditTrailUtil.saveAudit(
+                        Constants.Event.APPROVAL,
+                        Constants.Module.REGISTRATION,
+                        new JSONObject(oldRegistration).toString(),
+                        new JSONObject(registration).toString(),
+                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_APPROVED,
+                        authentication.getName()
+                );
+                break;
+            case Constants.registrationAction.SETTLEMENT:
+                if (!registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.SETTLEDBG)){
+                    throw new BadRequestAlertException("Tidak Dapat TUTUP BG dengan Status" + registration.get().getBgStatus(), "", "");
+                }
+                registration.get().setBgStatus(Constants.BankGuaranteeStatus.SETTLEDBG);
+                registrationRepository.save(registration.get());
+                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.SETTLEDBG, approvalDTO.getNotes());
+
+                //TODO AUDIT TRAIL
+                auditTrailUtil.saveAudit(
+                        Constants.Event.APPROVAL,
+                        Constants.Module.REGISTRATION,
+                        new JSONObject(oldRegistration).toString(),
+                        new JSONObject(registration).toString(),
+                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_APPROVED,
+                        authentication.getName()
+                );
+                break;
+            case Constants.registrationAction.REJECT:
+                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.REJECT)){
+                    throw new BadRequestAlertException("Tidak Dapat REJECT BG dengan Status" + registration.get().getBgStatus(), "", "");
+                }
                 registration.get().setBgStatus(Constants.BankGuaranteeStatus.REJECT);
                 registrationRepository.save(registration.get());
                 savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.REJECT, approvalDTO.getNotes());
@@ -249,86 +323,12 @@ public class RegistrationServiceImpl implements RegistrationService {
                         Constants.Module.REGISTRATION,
                         new JSONObject(oldRegistration).toString(),
                         new JSONObject(registration).toString(),
-                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_REJECTED,
+                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_APPROVED,
                         authentication.getName()
                 );
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new AjoException("Failed to reject");
-            }
-        }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.VERIFIKASI)){
-            Optional<User> users = userRepository.findOneByUsernameAndIsEnabled(authentication.getName(),true);
-            if (users.get().getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.TRO_MAKER)){
-                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION)){
-                    throw new BadRequestAlertException("Maker Tidak Dapat VERIFIED BG dengan Status" + registration.get().getBgStatus(), "", "");
-                }
-                registration.get().setBgStatus(Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION);
-                registrationRepository.save(registration.get());
-                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.WAITINGCHECKERVERIFICATION, approvalDTO.getNotes());
-
-                //TODO AUDIT TRAIL
-                auditTrailUtil.saveAudit(
-                        Constants.Event.VERIFIKASI,
-                        Constants.Module.REGISTRATION,
-                        new JSONObject(oldRegistration).toString(),
-                        new JSONObject(registration).toString(),
-                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_WAITING_VERIFICATION,
-                        authentication.getName()
-                );
-            }else {
-                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.VERIFIEDBG)){
-                    throw new BadRequestAlertException("Tidak Dapat VERIFIED BG dengan Status" + registration.get().getBgStatus(), "", "");
-                }
-                registration.get().setBgStatus(Constants.BankGuaranteeStatus.VERIFIEDBG);
-                registrationRepository.save(registration.get());
-                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.VERIFIEDBG, approvalDTO.getNotes());
-
-                //TODO AUDIT TRAIL
-                auditTrailUtil.saveAudit(
-                        Constants.Event.VERIFIKASI,
-                        Constants.Module.REGISTRATION,
-                        new JSONObject(oldRegistration).toString(),
-                        new JSONObject(registration).toString(),
-                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_VERIFIED,
-                        authentication.getName()
-                );
-            }
-        }else if (approvalDTO.getAction().toUpperCase().equalsIgnoreCase(Constants.registrationAction.SETTLEMENT)){
-            Optional<User> users = userRepository.findOneByUsernameAndIsEnabled(authentication.getName(),true);
-            if (users.get().getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.TRO_MAKER)){
-                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT)){
-                    throw new BadRequestAlertException("Maker Tidak Dapat SETTLE BG dengan Status" + registration.get().getBgStatus(), "", "");
-                }
-                registration.get().setBgStatus(Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT);
-                registrationRepository.save(registration.get());
-                savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.WAITINGBGSETTLEMENT, approvalDTO.getNotes());
-
-                //TODO AUDIT TRAIL
-                auditTrailUtil.saveAudit(
-                        Constants.Event.SETTLEMENT,
-                        Constants.Module.REGISTRATION,
-                        new JSONObject(oldRegistration).toString(),
-                        new JSONObject(registration).toString(),
-                        Constants.Remark.UPDATE_REGISTRATION_BG_SET_BG_WAITING_SETTLEMENT,
-                        authentication.getName()
-                );
-            }else {
-                if (registration.get().getBgStatus().equalsIgnoreCase(Constants.BankGuaranteeStatus.SETTLEDBG)){
-                    throw new BadRequestAlertException("Tidak Dapat SETTLE BG dengan Status" + registration.get().getBgStatus(), "", "");
-                }
-                String result = settledAll(registration.get());
-                if (result.equalsIgnoreCase(Constants.BankGuaranteeStatus.SETTLEDBG)){
-                    registration.get().setBgStatus(Constants.BankGuaranteeStatus.SETTLEDBG);
-                    registrationRepository.save(registration.get());
-                    savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.SETTLEDBG, approvalDTO.getNotes());
-                }else {
-                    registration.get().setBgStatus(registration.get().getBgStatus());
-                    registrationRepository.save(registration.get());
-                    savehistoryTransaction(approvalDTO.getIdJaminan(), registration.get().getBgStatus(), approvalDTO.getNotes());
-                }
-            }
-        }else {
-            throw new BadRequestAlertException("Action tidak valid","","");
+                break;
+            default:
+                throw new BadRequestAlertException("Action tidak valid","","");
         }
         return Boolean.TRUE;
     }
@@ -423,7 +423,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Async
-    private Boolean sendEmailBeneficiaryRejected(Optional<Registration> registration, String notes){
+    Boolean sendEmailBeneficiaryRejected(Optional<Registration> registration, String notes){
         Optional<MasterConfiguration> masterConfiguration = masterConfigurationRepository.findTop1ByStatusOrderByCreationDateDesc("ACTIVE");
         EmailRejectDTO emailRejectDTO = new EmailRejectDTO();
         emailRejectDTO.setSetFrom(masterConfiguration.get().getUsername());

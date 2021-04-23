@@ -71,13 +71,16 @@ public class ConfirmationServiceImpl implements ConfirmationService{
     @Transactional
     public Boolean saveConfirmation(ConfirmationDTO confirmationDTO, String draft) {
         Confirmation confirmation = new Confirmation();
-        String status;
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userLogin= authentication.getName();
+        User userPresent = userRepository.findOneByUsernameAndIsEnabled(authentication.getName(), true)
+                .orElseThrow(()->new EntityNotFoundException("User Not Found"));
 
         Registration registration= registrationRepository.findById(confirmationDTO.getIdJaminan())
                 .orElseThrow(()->new EntityNotFoundException("Nomor Jaminan Not Found"));
+        String status = registration.getBgStatus();
         User user = userRepository.findOneByUsernameAndIsEnabled(confirmationDTO.getUsername(), true)
                 .orElseThrow(()->new EntityNotFoundException("User Not Found"));
         Optional<Confirmation> confirmationFound = confirmationRepository.findByNomorKonfirmasiBankAndRegistration(confirmationDTO.getNomorKonfirmasiBank(), registration);
@@ -89,41 +92,46 @@ public class ConfirmationServiceImpl implements ConfirmationService{
             confirmation = ConfirmationMapper.INSTANCE.toEntity(confirmationDTO, confirmation);
             if (Boolean.parseBoolean(draft)){
                 status = Constants.BankGuaranteeStatus.DRAFT;
-            }else {
-                status = Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL;
             }
+//            else {
+//                if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.NASABAH)){
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL;
+//                }else if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.TRO_MAKER)){
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION;
+//                }else if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.TRO_CHECKER)){
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGVALIDATION;
+//                }else if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.BENEFICIARY_USER)){
+//                    status = Constants.BankGuaranteeStatus.APPROVEDBG;
+//                }else{
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION;
+//                }
+//            }
         }else {
             oldConfirmation = (Confirmation) SerializationUtils.clone(confirmationFound.get());
             if (Boolean.parseBoolean(draft)){
                 status = Constants.BankGuaranteeStatus.DRAFT;
-            }else {
-                status = Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL;
             }
+//            else {
+//                if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.NASABAH)){
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL;
+//                }else if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.TRO_MAKER)){
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION;
+//                }else if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.TRO_CHECKER)){
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGVALIDATION;
+//                }else if(userPresent.getRoles().get(0).getCode().equalsIgnoreCase(Constants.Role.BENEFICIARY_USER)){
+//                    status = Constants.BankGuaranteeStatus.APPROVEDBG;
+//                }else{
+//                    status = Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION;
+//                }
+//
+//            }
             confirmation = ConfirmationMapper.INSTANCE.toEntity(confirmationDTO, confirmationFound.get());
         }
         confirmation.setRegistration(registration);
         confirmation.setUser(user);
         confirmationRepository.save(confirmation);
 
-        //TODO AUDIT TRAIL SAVE CONFIRMATION
-        auditTrailUtil.saveAudit(
-                confirmationFound.isPresent() ? Constants.Event.UPDATE : Constants.Event.CREATE,
-                Constants.Module.CONFIRMATION,
-                confirmationFound.isPresent() ? new JSONObject(oldConfirmation).toString() : null,
-                new JSONObject(confirmation).toString(),
-                Constants.Remark.CREATE_CONFIRMATION_BG,
-                userLogin );
-
         registration.setBgStatus(status);
-
-        //TODO AUDIT TRAIL SAVE REGISTRATION SET STATUS BG WAITING APPROVAL OR DRAFT
-        auditTrailUtil.saveAudit(
-                Constants.Event.UPDATE,
-                Constants.Module.REGISTRATION,
-                new JSONObject(oldRegistration).toString(),
-                new JSONObject(registration).toString(),
-                status.equalsIgnoreCase(Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL) ? Constants.Remark.UPDATE_REGISTRATION_BG_STATUS_WAITING_APPROVAL : Constants.Remark.UPDATE_REGISTRATION_BG_STATUS_DRAFT,
-                userLogin );
 
         return Boolean.TRUE;
     }
