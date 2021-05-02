@@ -59,6 +59,21 @@ public class Statusutil {
                 Constants.BankGuaranteeStatus.APPROVEDBG);
     }
 
+    public static List<String> getStatusRoleKomite(){
+        return Arrays.asList(
+                Constants.BankGuaranteeStatus.WAITINGBGVALIDATION);
+    }
+
+    public static List<String> getStatusRoleNasabah(){
+        return Arrays.asList(
+                Constants.BankGuaranteeStatus.WAITINGBGAPPROVAL,
+                Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
+                Constants.BankGuaranteeStatus.WAITINGBGVALIDATION,
+                Constants.BankGuaranteeStatus.WAITINGBGCONFIRMATION,
+                Constants.BankGuaranteeStatus.REJECT
+        );
+    }
+
     public static List<String> getStatusRoleTroCheckerDeleteBg(){
         return Arrays.asList(
                 Constants.BankGuaranteeStatus.BGFROMSTAGING,
@@ -126,6 +141,7 @@ public class Statusutil {
         return Arrays.asList(
                 Constants.BankGuaranteeStatus.WAITINGBGVERIFICATION,
                 Constants.BankGuaranteeStatus.APPROVEDBG,
+                Constants.BankGuaranteeStatus.REJECT,
                 Constants.BankGuaranteeStatus.SETTLEDBG);
     }
 
@@ -177,8 +193,12 @@ public class Statusutil {
     public List<String> findStatusBasedOnRole(Role role){
         if (role.getCode().toUpperCase().equalsIgnoreCase(roleTroMaker)){
             return getStatusRoleTroMaker();
+        }else if (role.getCode().toUpperCase().equalsIgnoreCase(roleNasabah)){
+            return getStatusRoleNasabah();
         }else if (role.getCode().toUpperCase().equalsIgnoreCase(roleTroChecker)){
             return getStatusRoleTroChecker();
+        }else if (role.getCode().toUpperCase().equalsIgnoreCase(roleKomite)){
+            return getStatusRoleKomite();
         }else if (role.getCode().toUpperCase().equalsIgnoreCase(roleBeneficiaryUser)){
             return getStatusRolePlnUser();
         }else if (role.getCode().toUpperCase().equalsIgnoreCase(Constants.Role.BANK_ADMIN_1_MAKER)

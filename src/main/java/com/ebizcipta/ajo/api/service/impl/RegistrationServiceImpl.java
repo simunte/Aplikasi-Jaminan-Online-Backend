@@ -238,6 +238,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 confirmationLet.setSoftCopySuratKonfirmasiWithTtd(fileTtd.getName());
                 confirmationRepository.save(confirmationLet);
 
+                registration.get().setNomorJaminan("RCMPG"+registration.get().getId().toString());
                 registration.get().setApprovedDate(Instant.now());
                 registration.get().setApprovedBy(authentication.getName());
                 registration.get().setUserApprove(user);

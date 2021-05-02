@@ -14,8 +14,9 @@ import java.util.Optional;
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
     Optional<Registration> findByNomorJaminan(String nomorJaminan);
     List<Registration> findByBgStatusIn(List<String> status);
-    List<Registration> findByNasabah(User user);
+    List<Registration> findByNasabah(User username);
     List<Registration> findByBgStatus(String status);
+    List<Registration> findByBgStatusAndCreatedBy(String status, String username);
     List<Registration> findByTglKirimAbgLessThanAndBgStatus(Instant date, String status);
     List<Registration> findByTanggalBatasClaimLessThanAndBgStatus(Long date, String status);
     Optional<Registration> findTop1ByNomorJaminanAndBgStatusInOrderByNomorAmentmendDesc(String nomorJaminan, List<String> bgStatus);

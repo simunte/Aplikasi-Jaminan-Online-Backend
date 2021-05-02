@@ -100,6 +100,7 @@ public class Constants {
         public static final String TRO_MAKER="TRO_MAKER";
         public static final String CHECKER = "CHECKER";
         public static final String MAKER = "MAKER";
+        public static final String KOMITE = "KOMITE";
         public static final String NASABAH = "NASABAH";
     }
 

@@ -19,7 +19,6 @@ public class Registration extends Base{
     @Column(name = "tanggal_kirim")
     private Instant tglKirimAbg;
 
-    @NotNull
     @Column(name = "nomor_jaminan")
     private String  nomorJaminan;
 

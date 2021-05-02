@@ -76,7 +76,7 @@ public class MasterConfigurationController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PreAuthorize("@hasPrivilege.checkPrivilege('Configuration - Master Configuration_CREATE')")
+    @PreAuthorize("@hasPrivilege.checkPrivilege('Configuration - Master Configuration_APPROVE')")
     @PostMapping("/master/configuration/approval")
     @ApiOperation("Approval Master Configuration Data")
     public ResponseEntity<Boolean> approvalMasterConfiguration(@Valid @RequestBody GlobalApprovalDTO globalApprovalDTO) throws URISyntaxException{
