@@ -14,9 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_role_name", columnList = "name")
-})
+@Table(name = "role")
 public class Role extends Base {
 
     private String name;

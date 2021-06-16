@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="garansi-letter" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f659d89c-0aaa-4b00-b4f7-b9d2e7ae61f8">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="nomor_jaminan" class="java.lang.String"/>
+	<parameter name="beneficiary_name" class="java.lang.String"/>
+	<parameter name="beneficiary_address" class="java.lang.String"/>
+	<parameter name="nasabah_name" class="java.lang.String"/>
+	<parameter name="nasabah_address" class="java.lang.String"/>
+	<parameter name="nominal_garansi" class="java.lang.String"/>
+	<parameter name="contract_number" class="java.lang.String"/>
+	<parameter name="uraian_pekerjaan" class="java.lang.String"/>
+	<parameter name="tanggal_berakhir" class="java.lang.String"/>
+	<parameter name="tanggal_berlaku" class="java.lang.String"/>
+	<parameter name="tanggal_terbit" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<textField>
+				<reportElement x="150" y="0" width="260" height="62" uuid="5fa9223d-e599-4406-a90f-7cf957f4b614"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="11" isBold="true"/>
+					<paragraph leftIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA["JAMINAN PELAKSANAAN BANK GARANSI\nBANK GARANSI\nNO: "+$P{nomor_jaminan}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="f74e4f69-14bf-4e3f-8142-ab249f58b231"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<text><![CDATA[Kepada :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="16" width="280" height="15" uuid="79826d56-3fce-4137-8562-890f61912c0c"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{beneficiary_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="0" y="32" width="360" height="15" isRemoveLineWhenBlank="true" uuid="41eeef13-b159-4457-8c43-b92d59881bee"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{beneficiary_address}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="450" splitType="Stretch">
+			<textField>
+				<reportElement x="2" y="0" width="550" height="55" uuid="eac8a26d-dbef-49b9-9f78-f597e2a1fedf"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["PT. Bank XXX Berkedudukan di Jl. XXX (Untuk selanjutnya disebut “Bank“) dengan ini menjamin tanpa dapat ditarik kembali oleh: " + $P{nasabah_name} + " beralamat di: " + $P{nasabah_address} + " (Untuk Selanjutnya disebut “Terjamin”) Terhadap: " + $P{beneficiary_name} + " (Untuk Selanjutnya disebut “Penerima Jaminan”). Untuk membayar sejumlah uang sebesar " + $P{nominal_garansi} + "apabila berdasarkan opini/pendapat dari Penerima Jaminan, Terjamin melakukan wanprestasi dan/atau gagal memenuhi kewajibannya sebagaimana dinyatakan dalam Surat Perjanjian: "+$P{contract_number} + " tentang "+$P{uraian_pekerjaan}+"."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="510" height="15" uuid="ec1e44b9-2309-4e2e-a2b5-9956848d018c"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Bank Garansi ini dikeluarkan dengan ketentuan sebagai berikut:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="75" width="20" height="15" uuid="563fb2bc-b5e6-4dfd-a03b-ef53557a4315"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[1.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="20" y="75" width="530" height="15" uuid="593c3e7b-9ff9-4a27-a474-b100940dea5e"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Bank Garansi ini berlaku efektif sejak tanggal: "+$P{tanggal_berlaku}+" dan akan berakhir pada: "+$P{tanggal_berakhir}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="90" width="20" height="15" uuid="9708a645-0c2d-4df9-9389-333d8f86cb0a"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[2.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="20" y="90" width="530" height="35" uuid="a80d93e0-c241-4c1f-8184-e4d35100c8fc"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Times New Roman" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pembayaran atas Bank Garansi ini dilakukan setelah adanya surat permintaan pencairan Bank Garansi dari Penerima Jaminan kepada Bank yang menyatakan (i) jumlah yang harus dibayarkan kepada Penerima Jaminan, dan (ii) bahwa terjamin tidak memenuhi kewajibannya atau telah melakukan wanprestasi atas Surat Perjanjian No: "+$P{contract_number}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="125" width="20" height="15" uuid="7073e6b3-a541-4a03-bca7-f4767fd9ca2b"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[3.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="125" width="530" height="35" uuid="36075399-b0b2-4fac-9fab-103dd08c8475"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Batas waktu pengajuan dan penerimaan penagihan/klaim atas Bank Garansi ini adalah selambat-lambatnya 30 (tiga puluh) hari kalender sejak tanggal jatuh tempo Bank Garansi ini, dengan ketentuan apabila tanggal tersebut jatuh pada hari libur atau diluar hari kerja Bank, maka pengajuan dilakukan selambat-lambatnya pada satu hari kerja Bank setelahnya dengan melampirkan asli Bank Garansi ini.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="160" width="20" height="15" uuid="a72bd5e4-7484-4ddc-bba7-8a2e6211a87b"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[4.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="160" width="530" height="23" uuid="2a435f3a-0981-44d1-8e84-3197becef2a6"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Bank Akan membayar kepada Penerima Jaminan untuk jumlah tersebut diatas selambat-lambatnya 15 (lima belas) hari kalender setelah diterimanya surat permintaan pencairan Bank Garansi dari Penerima Jaminan kepada Bank.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="184" width="20" height="15" uuid="b3b1d2bd-0592-4fb9-9761-d905700b81cc"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[5.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="184" width="530" height="23" uuid="2d21ef36-1f77-4976-bddd-fa05bd57b9a4"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Pembayaran atas klaim/tuntutan pencairan adalah mutlak dan tanpa syarat meskipun ada tuntutan, permintaan atau keberatan dari pihak Terjamin atau pihak manapun.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="207" width="530" height="35" uuid="9a07eec2-7725-4114-99b0-9d5f0a15c14f"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Pembayaran atas klaim/tuntutan pencairan Bank Garansi akan dilakukan ke rekening Bank yang ditunjuk oleh Penerima Jaminan, bebas dan bersih serta tanpa pengurangan dengan alasan apapun, baik yang berlaku pada saat ini dan kemudian, dari semua pajak, pungutan, biaya atau pemotongan apapun, yang dibebankan atau dipotong sehubungan dengan hal-hal tersebut.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="242" width="530" height="15" uuid="e8bb1f6d-a1ce-4ae4-8691-4279781299b5"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Bank Garansi ini tidak dapat dipindahtangankan dan/atau dijamin kepada pihak lain.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="258" width="530" height="15" uuid="dbbc32ba-ca53-4555-ad7e-aa4f796f22ad"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Bank Garansi ini diatur oleh dan ditafsirkan berdasarkan peraturan perundang-udangan yang berlaku di Indonesia.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="273" width="530" height="35" uuid="51566212-fc3f-4d9e-8387-5003c8b6020d"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Sebagaimana dimaksud dalam Pasal 1832, Kitab Undang-undang Hukum Perdata, Bank dengan ini melepaskan hak-hak istimewanya yang diberikan oleh undang-undang untuk menuntut supaya benda-benda milik Terjamin dan/atau yang diikat sebagai jaminan lebih dahulu disita dan dijual untuk melunasi hutang Terjamin.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="207" width="20" height="15" uuid="a68eb9e2-6f7a-40d1-8108-c3b51479e3d5"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[6.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="242" width="20" height="15" uuid="21f0920d-4479-49ad-bfd5-b52420ce9bfd"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[7.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="258" width="20" height="15" uuid="cd246357-8995-429e-bf03-e04326205cae"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[8.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="273" width="20" height="15" uuid="36c87ce1-47bd-4411-a2dd-09f48eb18d7d"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[9.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="308" width="20" height="15" uuid="cbfd068a-4120-4ea7-b2d3-376a5214ecd2"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<text><![CDATA[10.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="308" width="530" height="15" uuid="ee0c817d-878f-4248-bdac-2ccb29a90947"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[Untuk tujuan Bank Garansi ini dan segala akibat hukumnya, Bank memilih domisili yang tetap di Kantor Panitera Pengadilan Negeri di Jakarta Pusat.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="350" width="549" height="25" uuid="a9b9aaea-652f-40cc-b0cd-c3f4d226375f"/>
+				<textElement>
+					<font fontName="Times New Roman" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Demikian Bank Garansi ini di terbitkan oleh yang berwenang pada tanggal: "+$P{tanggal_terbit}+" untuk dapat dipergunakan sebagaimana mestinya dan oleh yang berkepentingan."]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="420" width="158" height="15" uuid="2813d2ee-f0c1-4fbb-aa65-13abddaf2b3c"/>
+				<textElement>
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Jakarta "+$P{tanggal_terbit}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="435" width="158" height="15" uuid="d72ebca8-27ab-4f74-83ac-1e074430990d"/>
+				<textElement>
+					<font fontName="Times New Roman" size="10"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<text><![CDATA[PT. Bank XXX Indonesia]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="42" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

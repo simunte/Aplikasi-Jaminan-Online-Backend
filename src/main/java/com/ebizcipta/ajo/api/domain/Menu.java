@@ -17,9 +17,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_menu_name", columnList = "name")
-})
+@Table(name = "menu")
 public class Menu implements Serializable {
     private static final long serialVersionUID = 1L;
 

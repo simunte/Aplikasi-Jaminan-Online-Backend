@@ -10,9 +10,9 @@ server:
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOSTNAME:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:DATABASE_AJO}?useLegacyDatetimeCode=false&serverTimezone=UTC
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:welcome1}
+    url: jdbc:mysql://localhost:3306/ajo?useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password: welcome1
   jpa:
     hibernate.ddl-auto: update
     show-sql: false

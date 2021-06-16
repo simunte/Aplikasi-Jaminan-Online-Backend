@@ -262,6 +262,16 @@ public class UserServiceImpl implements UserDetailsService, UserService{
                 }
 
             }
+        }else {
+            UserNasabah userNasabahNew = userNasabahRepository.save(UserNasabahMapper.INSTANCE.toEntity(userNasabahDTO, new UserNasabah()));
+            if(userNasabahDTO.getSupportDocumentNasabahList().size() > 0){
+                userNasabahDTO.getSupportDocumentNasabahList().forEach(dto -> {
+                    NasabahSupportDocument entity = NasabahSupportDocumentMapper.INSTANCE.toEntity(dto, new NasabahSupportDocument());
+                    entity.setUserNasabah(userNasabahNew);
+                    entity.setIsDeleted(Boolean.FALSE);
+                    nasabahSupportDocumentRepository.saveAndFlush(entity);
+                });
+            }
         }
         return true;
     }

@@ -59,6 +59,9 @@ public class FileManagementServiceImpl implements FileManagementService{
     @Value("${file.confirmation.jasper.template.name}")
     String confirmationJasperTemplate;
 
+    @Value("${file.garansi.jasper.template.name}")
+    String garansiJaspeerTemplate;
+
     @Value("${file.directory.img}")
     String imageDirectory;
 
@@ -312,6 +315,55 @@ public class FileManagementServiceImpl implements FileManagementService{
         if (ttd == Boolean.TRUE){
             title.put("tanda_tangan", confirmation.getUser().getSignature());
         }
+        return title;
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> exportSuratGaransi(Registration registration){
+        String contentType = "application/octet-stream";
+
+        Map<String, Object> resultMap = new HashedMap();
+        HashMap title = variableSuratGaransi(registration);
+        List<Object> detail = null;
+
+        File file;
+        //FILENAME
+        String fileName = registration.getNomorJaminan()+ ".pdf";
+
+        file = new File(generatePdfFileJasperFromListObject(title, detail,
+                fileName, garansiJaspeerTemplate));
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (Exception e) {
+                throw new BadRequestAlertException("fail", "" ,"not Supported");
+            }
+        }
+        resultMap.put("file", file);
+        resultMap.put("contentType", contentType);
+
+        return resultMap;
+    }
+
+    public HashMap variableSuratGaransi(Registration registration){
+        HashMap title = new HashMap<>();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> user = userRepository.findOneByUsernameAndIsEnabled(authentication.getName(), true);
+        title.put("nomor_jaminan",registration.getNomorJaminan());
+        title.put("beneficiary_name",registration.getBeneficiary().getNamaBeneficiary());
+        title.put("beneficiary_address",registration.getBeneficiary().getDescription());
+        title.put("nasabah_name", registration.getApplicant());
+        title.put("nasabah_address", "alamat");
+        String nilaiJaminan = currency.currencyFormatting(registration.getNilaiJaminan());
+        title.put("nominal_garansi", nilaiJaminan);
+        title.put("contract_number", registration.getNomorKontrak());
+        title.put("uraian_pekerjaan", registration.getUraianPekerjaan());
+        String tanggalBerlaku = dateUtil.instantToString(dateUtil.longToInstant(registration.getTanggalBerlaku()), DD_MM_YYYY);
+        String tanggalBerakhir = dateUtil.instantToString(dateUtil.longToInstant(registration.getTanggalBerakhir()), DD_MM_YYYY);
+        String tanggalTerbit = dateUtil.instantToString(dateUtil.longToInstant(registration.getTanggalTerbit()), DD_MM_YYYY);
+        title.put("tanggal_berlaku",tanggalBerlaku);
+        title.put("tanggal_berakhir", tanggalBerakhir);
+        title.put("tanggal_terbit", tanggalTerbit);
         return title;
     }
 

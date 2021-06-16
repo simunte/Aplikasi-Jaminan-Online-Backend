@@ -176,6 +176,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         registration.setAlamatBankPenerbit(alamatBankPenerbit);
         registrationRepository.saveAndFlush(registration);
 
+
         //TODO AUDIT TRAIL
         auditTrailUtil.saveAudit(
                 dto.getId() != null ? Constants.Event.UPDATE : Constants.Event.CREATE,
@@ -188,6 +189,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (dto.getId() == null){
             Registration registrationNew = registrationRepository.findTop1ByNomorJaminanAndNomorAmentmendAndBgStatusNotOrderByNomorAmentmendDesc(registration.getNomorJaminan(), registration.getNomorAmentmend(), Constants.BankGuaranteeStatus.DELETEDBG)
                     .orElseThrow(()-> new BadRequestAlertException("Bank Guarantee Tidak ditemukan", "", ""));
+            registrationNew.setNomorJaminan("RCMPG"+registrationNew.getId().toString());
+            registrationRepository.save(registrationNew);
             return getConfirmationDto(registrationNew);
         }
         return getConfirmationDto(registration);
@@ -237,12 +240,14 @@ public class RegistrationServiceImpl implements RegistrationService {
                 confirmationLet.setSoftCopySuratKonfirmasi(file.getName());
                 confirmationLet.setSoftCopySuratKonfirmasiWithTtd(fileTtd.getName());
                 confirmationRepository.save(confirmationLet);
-
-                registration.get().setNomorJaminan("RCMPG"+registration.get().getId().toString());
                 registration.get().setApprovedDate(Instant.now());
                 registration.get().setApprovedBy(authentication.getName());
                 registration.get().setUserApprove(user);
                 registration.get().setBgStatus(Constants.BankGuaranteeStatus.WAITINGBGVALIDATION);
+                Map<String, Object> createGaransi = fileManagementService.exportSuratGaransi(registration.get());
+                File fileGaransi = (File) createGaransi.get("file");
+                registration.get().setSoftCopyJaminanName(fileGaransi.getName());
+                registration.get().setSoftCopyJaminanUrl(fileGaransi.getAbsolutePath());
                 registrationRepository.save(registration.get());
                 savehistoryTransaction(approvalDTO.getIdJaminan(), Constants.BankGuaranteeStatus.WAITINGBGVALIDATION, approvalDTO.getNotes());
 

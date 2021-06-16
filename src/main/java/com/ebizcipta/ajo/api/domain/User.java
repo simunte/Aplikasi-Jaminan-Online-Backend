@@ -23,10 +23,7 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users",
-        indexes = {
-        @Index(name = "idx_user_username", columnList = "username")
-})
+@Table(name = "users")
 public class User extends Base implements Serializable, UserDetails {
 
     private String username;
