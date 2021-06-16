@@ -142,10 +142,12 @@ public class Bootstrap implements CommandLineRunner {
     private final MessageSource messageSource;
     private final Environment environment;
     private final PasswordHistoryRepository passwordHistoryRepository;
+    private final MasterData masterData;
 
     public Bootstrap(UserRepository userRepository, MenuRepository menuRepository, RoleRepository roleRepository,
                      PrivilegeRepository privilegeRepository, BCryptPasswordEncoder encoder,
-                     PrivilegeUtil privilegeUtil, MessageSource messageSource, Environment environment, PasswordHistoryRepository passwordHistoryRepository) {
+                     PrivilegeUtil privilegeUtil, MessageSource messageSource, Environment environment,
+                     PasswordHistoryRepository passwordHistoryRepository, MasterData masterData) {
         this.userRepository = userRepository;
         this.menuRepository = menuRepository;
         this.roleRepository = roleRepository;
@@ -155,6 +157,7 @@ public class Bootstrap implements CommandLineRunner {
         this.messageSource = messageSource;
         this.environment = environment;
         this.passwordHistoryRepository = passwordHistoryRepository;
+        this.masterData = masterData;
     }
 
     @Override
@@ -169,6 +172,7 @@ public class Bootstrap implements CommandLineRunner {
 //        initRoleBeneficiaryUser();
 //        initBa1c();
 //        initBa1m();
+//        masterData.insertMasterData();
     }
 
 
